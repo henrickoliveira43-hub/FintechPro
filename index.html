@@ -86,7 +86,9 @@
                 <h1 id="pageTitle" class="text-2xl md:text-3xl font-bold tracking-tight">Painel Financeiro</h1>
                 <p class="text-sm text-slate-500 dark:text-slate-400">Gerenciamento offline seguro e em tempo real.</p>
             </div>
-            <div class="flex gap-2">
+            <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                <select id="monthSelector" onchange="updateMetrics(); renderTransactions();" class="w-full sm:w-auto px-3 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium focus:outline-none focus:border-brand-500 text-slate-900 dark:text-white shadow-sm cursor-pointer transition-colors">
+                    </select>
                 <button onclick="openModal('receita')" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-xl shadow-lg shadow-emerald-600/10 active:scale-95 transition-all text-sm">
                     <i class="fa-solid fa-plus-circle"></i> Receita
                 </button>
@@ -99,7 +101,7 @@
         <section id="tab-dashboard" class="space-y-6">
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div class="bg-white dark:bg-darkCard p-6 rounded-2xl border border-slate-200/60 dark:border-slate-700/50 shadow-sm relative overflow-hidden">
-                    <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Saldo Total</p>
+                    <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Saldo do Mês</p>
                     <p id="totalBalance" class="text-2xl md:text-3xl font-bold mt-2 text-slate-900 dark:text-white">R$ 0,00</p>
                     <div class="absolute -right-2 -bottom-2 text-slate-100 dark:text-slate-800/40 text-7xl font-bold pointer-events-none">
                         <i class="fa-solid fa-scale-balanced"></i>
@@ -124,7 +126,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 bg-white dark:bg-darkCard p-6 rounded-2xl border border-slate-200/60 dark:border-slate-700/50 shadow-sm">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-semibold text-lg">Distribuição de Gastos</h3>
+                        <h3 class="font-semibold text-lg">Distribuição de Gastos do Mês</h3>
                         <span class="text-xs bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-full text-slate-500">Automático</span>
                     </div>
                     <div id="chartContainer" class="space-y-4 pt-2">
@@ -155,11 +157,11 @@
 
             <div class="bg-white dark:bg-darkCard rounded-2xl border border-slate-200/60 dark:border-slate-700/50 shadow-sm overflow-hidden">
                 <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                    <h3 class="font-semibold text-lg">Atividades Recentes</h3>
+                    <h3 class="font-semibold text-lg">Atividades Recentes do Mês</h3>
                     <button onclick="switchTab('transactions')" class="text-sm text-brand-500 hover:underline">Ver todas</button>
                 </div>
                 <div class="divide-y divide-slate-100 dark:divide-slate-800/70" id="recentTransactionsList">
-                    </div>
+                </div>
             </div>
         </section>
 
@@ -170,7 +172,7 @@
                     <input type="text" id="searchInput" oninput="renderTransactions()" placeholder="Buscar por descrição ou categoria..." class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:border-brand-500 transition-colors">
                 </div>
                 <div class="flex gap-2">
-                    <select id="filterType" onchange="renderTransactions()" class="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:border-brand-500">
+                    <select id="filterType" onchange="renderTransactions()" class="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:border-brand-500 cursor-pointer">
                         <option value="all">Todos os tipos</option>
                         <option value="receita">Apenas Receitas</option>
                         <option value="despesa">Apenas Despesas</option>
@@ -183,31 +185,17 @@
 
             <div class="bg-white dark:bg-darkCard rounded-2xl border border-slate-200/60 dark:border-slate-700/50 shadow-sm overflow-hidden">
                 <div class="divide-y divide-slate-100 dark:divide-slate-800/70" id="fullTransactionsList">
-                    </div>
+                </div>
             </div>
         </section>
 
         <section id="tab-budgets" class="space-y-6 hidden">
             <div class="bg-white dark:bg-darkCard p-6 rounded-2xl border border-slate-200/60 dark:border-slate-700/50 shadow-sm">
                 <h3 class="font-bold text-lg mb-2">Simulador de Planejamento Mensal</h3>
-                <p class="text-sm text-slate-400 mb-6">Defina tetos de gastos para manter sua saúde financeira ideal em conformidade com as diretrizes de governança pessoal.</p>
+                <p class="text-sm text-slate-400 mb-6">Tetos de gastos recalculados dinamicamente com base nas receitas do mês de referência selecionado.</p>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
-                        <span class="text-xs font-semibold uppercase tracking-wider text-amber-500">Alimentação & Essenciais</span>
-                        <div class="flex justify-between items-center mt-2">
-                            <span class="text-xl font-bold">Limite: R$ 1.500,00</span>
-                            <span class="text-xs text-slate-400">Recomendado</span>
-                        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="dynamicBudgetsContainer">
                     </div>
-                    <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
-                        <span class="text-xs font-semibold uppercase tracking-wider text-blue-500">Lazer & Variados</span>
-                        <div class="flex justify-between items-center mt-2">
-                            <span class="text-xl font-bold">Limite: R$ 800,00</span>
-                            <span class="text-xs text-slate-400">Recomendado</span>
-                        </div>
-                    </div>
-                </div>
             </div>
         </section>
     </main>
@@ -308,14 +296,65 @@
             return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
-        // Cálculos Financeiros em Tempo Real
+        // Alimenta e atualiza as opções do Mês de Referência baseando-se nas datas das transações existentes
+        function updateMonthSelectorOptions() {
+            const selector = document.getElementById('monthSelector');
+            const previousSelection = selector.value;
+            const months = new Set();
+            
+            // Sempre inclui o mês da data de hoje para garantir uma visualização inicial consistente
+            const today = new Date();
+            const currentYearMonth = today.toISOString().substring(0, 7); // "2026-06"
+            months.add(currentYearMonth);
+
+            state.transactions.forEach(tx => {
+                if (tx.date && tx.date.length >= 7) {
+                    months.add(tx.date.substring(0, 7));
+                }
+            });
+
+            // Ordena os meses em formato decrescente (do mais recente para o mais antigo)
+            const sortedMonths = Array.from(months).sort((a, b) => b.localeCompare(a));
+            const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+            
+            let htmlOptions = '<option value="all">Todos os Meses</option>';
+            sortedMonths.forEach(m => {
+                const [year, month] = m.split('-');
+                const label = `${monthNames[parseInt(month) - 1]} / ${year}`;
+                htmlOptions += `<option value="${m}">${label}</option>`;
+            });
+
+            selector.innerHTML = htmlOptions;
+
+            // Restaura a seleção anterior ou define o mês corrente como padrão
+            if (previousSelection && months.has(previousSelection)) {
+                selector.value = previousSelection;
+            } else {
+                selector.value = currentYearMonth;
+            }
+        }
+
+        // Cálculos Financeiros Dinâmicos Filtrados por Mês de Referência
         function updateMetrics() {
             let incomes = 0;
             let expenses = 0;
+            let foodExpenses = 0;
+            let leisureExpenses = 0;
+            const selectedMonth = document.getElementById('monthSelector').value;
 
             state.transactions.forEach(tx => {
-                if (tx.type === 'receita') incomes += tx.amount;
-                else expenses += tx.amount;
+                if (selectedMonth !== 'all') {
+                    const txMonth = tx.date.substring(0, 7);
+                    if (txMonth !== selectedMonth) return;
+                }
+
+                if (tx.type === 'receita') {
+                    incomes += tx.amount;
+                } else {
+                    expenses += tx.amount;
+                    if (tx.category === 'Alimentação') foodExpenses += tx.amount;
+                    if (tx.category === 'Lazer') leisureExpenses += tx.amount;
+                }
             });
 
             const balance = incomes - expenses;
@@ -324,7 +363,7 @@
             document.getElementById('totalIncomes').innerText = formatCurrency(incomes);
             document.getElementById('totalExpenses').innerText = formatCurrency(expenses);
 
-            // Atualização da Meta de Economia (Exemplo Regra de Negócio: Guardar 30%)
+            // Regra de Negócio de Economia (Meta Fixa de 30%)
             if (incomes > 0) {
                 const savedPercent = Math.min(Math.round(((incomes - expenses) / incomes) * 100), 100);
                 const positiveSaved = savedPercent > 0 ? savedPercent : 0;
@@ -335,12 +374,71 @@
                 document.getElementById('metaProgressBar').style.width = `0%`;
             }
 
-            // Geração de Gráfico Dinâmico Baseado em Categorias
-            renderCharts(expenses);
+            renderCharts(expenses, selectedMonth);
+            renderDynamicBudgets(incomes, foodExpenses, leisureExpenses);
         }
 
-        // Geração Inteligente e Reativa de Gráficos CSS Dinâmicos
-        function renderCharts(totalExpenses) {
+        // Geração da Aba Planejamento & Metas Dinâmica
+        function renderDynamicBudgets(totalIncomes, foodExpenses, leisureExpenses) {
+            const container = document.getElementById('dynamicBudgetsContainer');
+            
+            // Definição das Regras Dinâmicas de Limites Recomendados:
+            // Se não houver receita registrada no mês, assume um limite básico padrão (ex: R$1500 e R$800)
+            const foodLimit = totalIncomes > 0 ? (totalIncomes * 0.30) : 1500.00; // 30% da Receita real
+            const leisureLimit = totalIncomes > 0 ? (totalIncomes * 0.15) : 800.00; // 15% da Receita real
+
+            const foodPct = Math.min(Math.round((foodExpenses / foodLimit) * 100), 100);
+            const leisurePct = Math.min(Math.round((leisureExpenses / leisureLimit) * 100), 100);
+
+            container.innerHTML = `
+                <div class="p-5 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800 flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-amber-500">Alimentação & Essenciais</span>
+                            <span class="text-[10px] bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded font-medium">Meta: 30% da Receita</span>
+                        </div>
+                        <div class="flex justify-between items-baseline mt-2">
+                            <span class="text-xl font-bold text-slate-900 dark:text-white">Limite: ${formatCurrency(foodLimit)}</span>
+                            <span class="text-xs text-slate-400">Gasto: ${formatCurrency(foodExpenses)}</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+                            <div class="bg-amber-500 h-full rounded-full transition-all duration-500" style="width: ${foodPct}%"></div>
+                        </div>
+                        <div class="flex justify-between text-[11px] text-slate-400">
+                            <span>Consumido</span>
+                            <span class="${foodPct >= 100 ? 'text-rose-500 font-bold' : ''}">${foodPct}%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-5 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800 flex flex-col justify-between space-y-4">
+                    <div>
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-semibold uppercase tracking-wider text-blue-500">Lazer & Variados</span>
+                            <span class="text-[10px] bg-blue-500/10 text-blue-500 px-2 py-0.5 rounded font-medium">Meta: 15% da Receita</span>
+                        </div>
+                        <div class="flex justify-between items-baseline mt-2">
+                            <span class="text-xl font-bold text-slate-900 dark:text-white">Limite: ${formatCurrency(leisureLimit)}</span>
+                            <span class="text-xs text-slate-400">Gasto: ${formatCurrency(leisureExpenses)}</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+                            <div class="bg-blue-500 h-full rounded-full transition-all duration-500" style="width: ${leisurePct}%"></div>
+                        </div>
+                        <div class="flex justify-between text-[11px] text-slate-400">
+                            <span>Consumido</span>
+                            <span class="${leisurePct >= 100 ? 'text-rose-500 font-bold' : ''}">${leisurePct}%</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Renderização Reativa de Gráficos CSS da Home
+        function renderCharts(totalExpenses, selectedMonth) {
             const chartContainer = document.getElementById('chartContainer');
             if (totalExpenses === 0) {
                 chartContainer.innerHTML = `<p class="text-sm text-slate-400 text-center py-8">Nenhuma despesa para gerar a distribuição de gráficos.</p>`;
@@ -349,6 +447,10 @@
 
             const categoriesMap = {};
             state.transactions.filter(t => t.type === 'despesa').forEach(tx => {
+                if (selectedMonth !== 'all') {
+                    const txMonth = tx.date.substring(0, 7);
+                    if (txMonth !== selectedMonth) return;
+                }
                 categoriesMap[tx.category] = (categoriesMap[tx.category] || 0) + tx.amount;
             });
 
@@ -372,21 +474,22 @@
             }
         }
 
-        // Renderização Pró das Listas de Transação
+        // Renderização Filtrada e Inteligente da Lista de Transações
         function renderTransactions() {
             const recentList = document.getElementById('recentTransactionsList');
             const fullList = document.getElementById('fullTransactionsList');
             const searchVal = document.getElementById('searchInput').value.toLowerCase();
             const filterType = document.getElementById('filterType').value;
+            const selectedMonth = document.getElementById('monthSelector').value;
 
-            // Ordenação por data mais recente
             const sortedTxs = [...state.transactions].sort((a,b) => new Date(b.date) - new Date(a.date));
 
-            // Filtros aplicados
             const filteredTxs = sortedTxs.filter(tx => {
                 const matchesSearch = tx.description.toLowerCase().includes(searchVal) || tx.category.toLowerCase().includes(searchVal);
                 const matchesType = filterType === 'all' || tx.type === filterType;
-                return matchesSearch && matchesType;
+                const matchesMonth = selectedMonth === 'all' || tx.date.substring(0, 7) === selectedMonth;
+
+                return matchesSearch && matchesType && matchesMonth;
             });
 
             const renderItem = (tx) => `
@@ -411,14 +514,13 @@
                 </div>
             `;
 
-            // Atualiza aba Dashboard (Apenas os últimos 3 itens)
-            recentList.innerHTML = sortedTxs.slice(0, 3).map(renderItem).join('') || `<p class="text-center p-6 text-sm text-slate-400">Nenhum registro encontrado.</p>`;
-            
-            // Atualiza aba Transações Completa
+            const dashboardTxs = sortedTxs.filter(tx => selectedMonth === 'all' || tx.date.substring(0, 7) === selectedMonth);
+
+            recentList.innerHTML = dashboardTxs.slice(0, 3).map(renderItem).join('') || `<p class="text-center p-6 text-sm text-slate-400">Nenhum registro encontrado para este mês.</p>`;
             fullList.innerHTML = filteredTxs.map(renderItem).join('') || `<p class="text-center p-6 text-sm text-slate-400">Nenhum registro encontrado.</p>`;
         }
 
-        // Operações CRUD com Persistência Local Segura
+        // Persistência local e CRUD
         function handleFormSubmit(e) {
             e.preventDefault();
             
@@ -431,7 +533,7 @@
             if(!desc || isNaN(amt) || amt <= 0) return;
 
             const newTx = {
-                id: Date.now(), // ID Único robusto temporal
+                id: Date.now(),
                 description: desc,
                 amount: amt,
                 type: type,
@@ -440,6 +542,12 @@
             };
 
             state.transactions.push(newTx);
+            
+            const insertedMonth = date.substring(0, 7);
+            localStorage.setItem('fintech_txs', JSON.stringify(state.transactions));
+            updateMonthSelectorOptions();
+            document.getElementById('monthSelector').value = insertedMonth;
+            
             saveAndRefresh();
             closeModal();
             document.getElementById('transactionForm').reset();
@@ -452,11 +560,12 @@
 
         function saveAndRefresh() {
             localStorage.setItem('fintech_txs', JSON.stringify(state.transactions));
+            updateMonthSelectorOptions();
             updateMetrics();
             renderTransactions();
         }
 
-        // Controle UI Avançado para Modais Fluidos
+        // Gestão Visual de Modais Fluidos
         function openModal(type) {
             document.getElementById('txType').value = type;
             document.getElementById('modalTitle').innerText = type === 'receita' ? 'Adicionar Receita' : 'Adicionar Despesa';
@@ -468,7 +577,6 @@
                 document.getElementById('modalContent').classList.remove('scale-95');
             }, 10);
             
-            // Define data padrão de hoje
             document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
         }
 
@@ -481,8 +589,8 @@
             }, 300);
         }
 
-        // Exportação de Dados em JSON Estruturado (Prevenção de Perda de Dados)
-         ZionExport: function exportData() {
+        // Exportação de Dados Estruturados
+        function exportData() {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state.transactions, null, 2));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
@@ -492,12 +600,12 @@
             downloadAnchor.remove();
         }
 
-        // Inicialização Automática do App
+        // Inicialização do Ciclo de Vida do App
         document.addEventListener("DOMContentLoaded", () => {
-            // Checar preferência de tema do sistema operacional ou localStorage
             if (localStorage.getItem('theme') === 'light') {
                 document.documentElement.classList.remove('dark');
             }
+            updateMonthSelectorOptions();
             updateMetrics();
             renderTransactions();
         });
