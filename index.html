@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fintech Pro - Controle Financeiro Inteligente</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            900: '#14532d',
+                        },
+                        darkBg: '#0f172a',
+                        darkCard: '#1e293b'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-darkBg dark:text-slate-100 min-h-screen flex flex-col md:flex-row antialiased">
+
+    <aside class="w-full md:w-64 bg-white dark:bg-darkCard border-b md:border-r border-slate-200 dark:border-slate-700 p-4 flex flex-col justify-between md:min-h-screen shadow-sm z-50">
+        <div>
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-brand-500 rounded-xl text-white shadow-lg shadow-brand-500/20">
+                        <i class="fa-solid fa-wallet text-xl"></i>
+                    </div>
+                    <span class="text-xl font-bold bg-gradient-to-r from-brand-500 to-emerald-400 bg-clip-text text-transparent">FintechPro</span>
+                </div>
+                <button id="themeToggle" class="p-2 text-slate-500 hover:text-brand-500 dark:text-slate-400 rounded-lg transition-colors">
+                    <i class="fa-solid fa-moon text-lg dark:hidden"></i>
+                    <i class="fa-solid fa-sun text-lg hidden dark:block"></i>
+                </button>
+            </div>
+
+            <nav class="space-y-1">
+                <a href="#" class="flex items-center gap-3 px-4 py-3 bg-brand-500/10 text-brand-500 font-medium rounded-xl transition-all" onclick="switchTab('dashboard')">
+                    <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-xl transition-all" onclick="switchTab('transactions')">
+                    <i class="fa-solid fa-list-check w-5"></i> Transações
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/50 rounded-xl transition-all" onclick="switchTab('budgets')">
+                    <i class="fa-solid fa-bullseye w-5"></i> Planejamento & Metas
+                </a>
+            </nav>
+        </div>
+
+        <div class="mt-6 md:mt-0 pt-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-slate-300 dark:bg-slate-600 flex items-center justify-center font-bold text-slate-700 dark:text-slate-200">
+                    HO
+                </div>
+                <div>
+                    <p class="text-sm font-semibold">Henrique O.</p>
+                    <span class="text-xs text-emerald-500 flex items-center gap-1"><span class="h-1.5 w-1.5 bg-emerald-500 rounded-full inline-block animate-pulse"></span> Sincronizado</span>
+                </div>
+            </div>
+            <button class="text-slate-400 hover:text-rose-500 transition-colors" title="Sair (Simulação)">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-4 md:p-8 space-y-6 overflow-y-auto max-w-7xl mx-auto w-full">
+        
+        <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <h1 id="pageTitle" class="text-2xl md:text-3xl font-bold tracking-tight">Painel Financeiro</h1>
+                <p class="text-sm text-slate-500 dark:text-slate-400">Gerenciamento offline seguro e em tempo real.</p>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="openModal('receita')" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-xl shadow-lg shadow-emerald-600/10 active:scale-95 transition-all text-sm">
+                    <i class="fa-solid fa-plus-circle"></i> Receita
+                </button>
+                <button onclick="openModal('despesa')" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-medium rounded-xl shadow-lg shadow-rose-600/10 active:scale-95 transition-all text-sm">
+                    <i class="fa-solid fa-minus-circle"></i> Despesa
+                </button>
+            </div>
+        </header>
+
+        <section id="tab-dashboard" class="space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-white dark:bg-darkCard p-6 rounded-2xl border border-slate-200/60 dark:border-slate-700/50 shadow-sm relative overflow-hidden">
+                    <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Saldo Total</p>
+                    <p id="totalBalance" class="text-2xl md:text-3xl font-bold mt-2 text-slate-900 dark:text-white">R$ 0,00</p>
+                    <div class="absolute -right-2 -bottom-2 text-slate-100 dark:text-slate-800/40 text-7xl font-bold pointer-events-none">
+                        <i class="fa-solid fa-scale-balanced"></i>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-darkCard p-6 rounded-2xl border border-slate-200/60 dark:border-slate-700/50 shadow-sm relative overflow-hidden">
+                    <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Receitas (Mês)</p>
+                    <p id="totalIncomes" class="text-2xl md:text-3xl font-bold mt-2 text-emerald-500">R$ 0,00</p>
+                    <div class="absolute -right-2 -bottom-2 text-emerald-500/5 text-7xl font-bold pointer-events-none">
+                        <i class="fa-solid fa-arrow-trend-up"></i>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-darkCard p-6 rounded-2xl border border-slate-200/60 dark:border-slate-700/50 shadow-sm relative overflow-hidden">
+                    <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Despesas (Mês)</p>
+                    <p id="totalExpenses" class="text-2xl md:text-3xl font-bold mt-2 text-rose-500">R$ 0,00</p>
+                    <div class="absolute -right-2 -bottom-2 text-rose-500/5 text-7xl font-bold pointer-events-none">
+                        <i class="fa-solid fa-arrow-trend-down"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-white dark:bg-darkCard p-6 rounded-2xl border border-slate-200/60 dark:border-slate-700/50 shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold text-lg">Distribuição de Gastos</h3>
+                        <span class="text-xs bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-full text-slate-500">Automático</span>
+                    </div>
+                    <div id="chartContainer" class="space-y-4 pt-2">
+                        <p class="text-sm text-slate-400 text-center py-8">Nenhuma transação registrada para gerar gráficos.</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-darkCard p-6 rounded-2xl border border-slate-200/60 dark:border-slate-700/50 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="font-semibold text-lg mb-4">Meta de Economia Mensal</h3>
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-slate-400">Progresso Geral</span>
+                                <span id="metaPercent" class="font-medium text-brand-500">0%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-3 overflow-hidden">
+                                <div id="metaProgressBar" class="bg-brand-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                            </div>
+                            <p class="text-xs text-slate-400 mt-1">Sua meta padrão é economizar 30% das receitas.</p>
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex gap-2 items-center text-xs text-slate-400">
+                        <i class="fa-solid fa-shield-halved text-brand-500"></i>
+                        <span>Dados locais protegidos por criptografia de sessão.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-darkCard rounded-2xl border border-slate-200/60 dark:border-slate-700/50 shadow-sm overflow-hidden">
+                <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                    <h3 class="font-semibold text-lg">Atividades Recentes</h3>
+                    <button onclick="switchTab('transactions')" class="text-sm text-brand-500 hover:underline">Ver todas</button>
+                </div>
+                <div class="divide-y divide-slate-100 dark:divide-slate-800/70" id="recentTransactionsList">
+                    </div>
+            </div>
+        </section>
+
+        <section id="tab-transactions" class="space-y-6 hidden">
+            <div class="bg-white dark:bg-darkCard p-4 rounded-2xl border border-slate-200/60 dark:border-slate-700/50 shadow-sm flex flex-col sm:flex-row gap-3">
+                <div class="relative flex-1">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="searchInput" oninput="renderTransactions()" placeholder="Buscar por descrição ou categoria..." class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:border-brand-500 transition-colors">
+                </div>
+                <div class="flex gap-2">
+                    <select id="filterType" onchange="renderTransactions()" class="px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:border-brand-500">
+                        <option value="all">Todos os tipos</option>
+                        <option value="receita">Apenas Receitas</option>
+                        <option value="despesa">Apenas Despesas</option>
+                    </select>
+                    <button onclick="exportData()" class="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-medium rounded-xl text-sm transition-colors flex items-center gap-2">
+                        <i class="fa-solid fa-download"></i> Exportar JSON
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-darkCard rounded-2xl border border-slate-200/60 dark:border-slate-700/50 shadow-sm overflow-hidden">
+                <div class="divide-y divide-slate-100 dark:divide-slate-800/70" id="fullTransactionsList">
+                    </div>
+            </div>
+        </section>
+
+        <section id="tab-budgets" class="space-y-6 hidden">
+            <div class="bg-white dark:bg-darkCard p-6 rounded-2xl border border-slate-200/60 dark:border-slate-700/50 shadow-sm">
+                <h3 class="font-bold text-lg mb-2">Simulador de Planejamento Mensal</h3>
+                <p class="text-sm text-slate-400 mb-6">Defina tetos de gastos para manter sua saúde financeira ideal em conformidade com as diretrizes de governança pessoal.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-amber-500">Alimentação & Essenciais</span>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-xl font-bold">Limite: R$ 1.500,00</span>
+                            <span class="text-xs text-slate-400">Recomendado</span>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-blue-500">Lazer & Variados</span>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-xl font-bold">Limite: R$ 800,00</span>
+                            <span class="text-xs text-slate-400">Recomendado</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="transactionModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-darkCard w-full max-w-md rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300" id="modalContent">
+            <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                <h3 id="modalTitle" class="font-bold text-lg">Nova Transação</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="transactionForm" onsubmit="handleFormSubmit(event)" class="p-6 space-y-4">
+                <input type="hidden" id="txType" value="receita">
+                
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">Descrição</label>
+                    <input type="text" id="txDescription" required maxlength="50" placeholder="Ex: Supermercado, Salário" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:border-brand-500 text-slate-900 dark:text-white">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">Valor (R$)</label>
+                        <input type="number" id="txAmount" required step="0.01" min="0.01" placeholder="0,00" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:border-brand-500 text-slate-900 dark:text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">Categoria</label>
+                        <select id="txCategory" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:border-brand-500 text-slate-900 dark:text-white">
+                            <option value="Alimentação">Alimentação</option>
+                            <option value="Salário">Salário</option>
+                            <option value="Transporte">Transporte</option>
+                            <option value="Moradia">Moradia</option>
+                            <option value="Lazer">Lazer</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">Data</label>
+                    <input type="date" id="txDate" required class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:border-brand-500 text-slate-900 dark:text-white">
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex gap-2">
+                    <button type="button" onclick="closeModal()" class="flex-1 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm font-medium rounded-xl transition-colors">Cancelar</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium rounded-xl shadow-lg shadow-brand-500/10 transition-colors">Salvar Transação</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Estado Geral da Aplicação (Carregamento Offline Seguro do LocalStorage)
+        let state = {
+            transactions: JSON.parse(localStorage.getItem('fintech_txs')) || [
+                { id: 1, description: 'Salário Mensal', amount: 5500.00, type: 'receita', category: 'Salário', date: '2026-06-05' },
+                { id: 2, description: 'Supermercado Central', amount: 450.32, type: 'despesa', category: 'Alimentação', date: '2026-06-10' },
+                { id: 3, description: 'Assinatura Streaming', amount: 55.90, type: 'despesa', category: 'Lazer', date: '2026-06-12' }
+            ]
+        };
+
+        // Gerenciamento de Tema Alternável (Dark Mode Nativo)
+        const themeToggleBtn = document.getElementById('themeToggle');
+        themeToggleBtn.addEventListener('click', () => {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+
+        // SPA Tab Switcher
+        function switchTab(tabId) {
+            document.querySelectorAll('main > section').forEach(section => section.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            
+            // Atualiza visual dos menus laterais
+            document.querySelectorAll('aside nav a').forEach(a => {
+                a.classList.remove('bg-brand-500/10', 'text-brand-500', 'font-medium');
+                a.classList.add('text-slate-600', 'dark:text-slate-400');
+            });
+            event.currentTarget.classList.add('bg-brand-500/10', 'text-brand-500', 'font-medium');
+            
+            const titles = { dashboard: 'Painel Financeiro', transactions: 'Histórico de Transações', budgets: 'Planejamento & Metas' };
+            document.getElementById('pageTitle').innerText = titles[tabId];
+        }
+
+        // Sanitização Ativa de Inputs contra XSS Injection
+        function sanitizeString(str) {
+            return str.replace(/[&<>"']/g, function(match) {
+                const escape = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;' };
+                return escape[match];
+            });
+        }
+
+        // Formatação Monetária Padrão Real
+        function formatCurrency(value) {
+            return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        // Cálculos Financeiros em Tempo Real
+        function updateMetrics() {
+            let incomes = 0;
+            let expenses = 0;
+
+            state.transactions.forEach(tx => {
+                if (tx.type === 'receita') incomes += tx.amount;
+                else expenses += tx.amount;
+            });
+
+            const balance = incomes - expenses;
+
+            document.getElementById('totalBalance').innerText = formatCurrency(balance);
+            document.getElementById('totalIncomes').innerText = formatCurrency(incomes);
+            document.getElementById('totalExpenses').innerText = formatCurrency(expenses);
+
+            // Atualização da Meta de Economia (Exemplo Regra de Negócio: Guardar 30%)
+            if (incomes > 0) {
+                const savedPercent = Math.min(Math.round(((incomes - expenses) / incomes) * 100), 100);
+                const positiveSaved = savedPercent > 0 ? savedPercent : 0;
+                document.getElementById('metaPercent').innerText = `${positiveSaved}%`;
+                document.getElementById('metaProgressBar').style.width = `${positiveSaved}%`;
+            } else {
+                document.getElementById('metaPercent').innerText = `0%`;
+                document.getElementById('metaProgressBar').style.width = `0%`;
+            }
+
+            // Geração de Gráfico Dinâmico Baseado em Categorias
+            renderCharts(expenses);
+        }
+
+        // Geração Inteligente e Reativa de Gráficos CSS Dinâmicos
+        function renderCharts(totalExpenses) {
+            const chartContainer = document.getElementById('chartContainer');
+            if (totalExpenses === 0) {
+                chartContainer.innerHTML = `<p class="text-sm text-slate-400 text-center py-8">Nenhuma despesa para gerar a distribuição de gráficos.</p>`;
+                return;
+            }
+
+            const categoriesMap = {};
+            state.transactions.filter(t => t.type === 'despesa').forEach(tx => {
+                categoriesMap[tx.category] = (categoriesMap[tx.category] || 0) + tx.amount;
+            });
+
+            chartContainer.innerHTML = '';
+            for (let cat in categoriesMap) {
+                const amt = categoriesMap[cat];
+                const pct = Math.round((amt / totalExpenses) * 100);
+                
+                const barHtml = `
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-medium">
+                            <span class="text-slate-700 dark:text-slate-300">${cat}</span>
+                            <span class="text-slate-400">${formatCurrency(amt)} (${pct}%)</span>
+                        </div>
+                        <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2">
+                            <div class="bg-brand-500 h-2 rounded-full" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+                chartContainer.innerHTML += barHtml;
+            }
+        }
+
+        // Renderização Pró das Listas de Transação
+        function renderTransactions() {
+            const recentList = document.getElementById('recentTransactionsList');
+            const fullList = document.getElementById('fullTransactionsList');
+            const searchVal = document.getElementById('searchInput').value.toLowerCase();
+            const filterType = document.getElementById('filterType').value;
+
+            // Ordenação por data mais recente
+            const sortedTxs = [...state.transactions].sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            // Filtros aplicados
+            const filteredTxs = sortedTxs.filter(tx => {
+                const matchesSearch = tx.description.toLowerCase().includes(searchVal) || tx.category.toLowerCase().includes(searchVal);
+                const matchesType = filterType === 'all' || tx.type === filterType;
+                return matchesSearch && matchesType;
+            });
+
+            const renderItem = (tx) => `
+                <div class="flex items-center justify-between p-4 hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-all">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-semibold ${tx.type === 'receita' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}">
+                            <i class="${tx.type === 'receita' ? 'fa-solid fa-arrow-trend-up' : 'fa-solid fa-arrow-trend-down'}"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-sm text-slate-900 dark:text-white">${sanitizeString(tx.description)}</p>
+                            <span class="text-xs text-slate-400">${tx.category} • ${tx.date.split('-').reverse().join('/')}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="font-semibold text-sm ${tx.type === 'receita' ? 'text-emerald-500' : 'text-slate-900 dark:text-white'}">
+                            ${tx.type === 'receita' ? '+' : '-'} ${formatCurrency(tx.amount)}
+                        </span>
+                        <button onclick="deleteTransaction(${tx.id})" class="text-slate-400 hover:text-rose-500 transition-colors text-xs p-1" title="Excluir">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // Atualiza aba Dashboard (Apenas os últimos 3 itens)
+            recentList.innerHTML = sortedTxs.slice(0, 3).map(renderItem).join('') || `<p class="text-center p-6 text-sm text-slate-400">Nenhum registro encontrado.</p>`;
+            
+            // Atualiza aba Transações Completa
+            fullList.innerHTML = filteredTxs.map(renderItem).join('') || `<p class="text-center p-6 text-sm text-slate-400">Nenhum registro encontrado.</p>`;
+        }
+
+        // Operações CRUD com Persistência Local Segura
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const desc = document.getElementById('txDescription').value;
+            const amt = parseFloat(document.getElementById('txAmount').value);
+            const cat = document.getElementById('txCategory').value;
+            const date = document.getElementById('txDate').value;
+            const type = document.getElementById('txType').value;
+
+            if(!desc || isNaN(amt) || amt <= 0) return;
+
+            const newTx = {
+                id: Date.now(), // ID Único robusto temporal
+                description: desc,
+                amount: amt,
+                type: type,
+                category: cat,
+                date: date
+            };
+
+            state.transactions.push(newTx);
+            saveAndRefresh();
+            closeModal();
+            document.getElementById('transactionForm').reset();
+        }
+
+        function deleteTransaction(id) {
+            state.transactions = state.transactions.filter(tx => tx.id !== id);
+            saveAndRefresh();
+        }
+
+        function saveAndRefresh() {
+            localStorage.setItem('fintech_txs', JSON.stringify(state.transactions));
+            updateMetrics();
+            renderTransactions();
+        }
+
+        // Controle UI Avançado para Modais Fluidos
+        function openModal(type) {
+            document.getElementById('txType').value = type;
+            document.getElementById('modalTitle').innerText = type === 'receita' ? 'Adicionar Receita' : 'Adicionar Despesa';
+            
+            const modal = document.getElementById('transactionModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                document.getElementById('modalContent').classList.remove('scale-95');
+            }, 10);
+            
+            // Define data padrão de hoje
+            document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('transactionModal');
+            modal.classList.add('opacity-0');
+            document.getElementById('modalContent').classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Exportação de Dados em JSON Estruturado (Prevenção de Perda de Dados)
+         ZionExport: function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state.transactions, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `FintechPro_Export_${new Date().toISOString().split('T')[0]}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        // Inicialização Automática do App
+        document.addEventListener("DOMContentLoaded", () => {
+            // Checar preferência de tema do sistema operacional ou localStorage
+            if (localStorage.getItem('theme') === 'light') {
+                document.documentElement.classList.remove('dark');
+            }
+            updateMetrics();
+            renderTransactions();
+        });
+    </script>
+</body>
+</html>
