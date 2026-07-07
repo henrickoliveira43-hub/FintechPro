@@ -35,7 +35,7 @@
         }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght={300;400;500;600;700}&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -76,8 +76,8 @@
         </div>
 
         <div class="mt-6 md:mt-0 pt-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-center text-xs text-slate-400 gap-2">
-            <i class="fa-solid fa-shield-halved text-brand-500 text-sm animate-pulseSlow"></i>
-            <span class="font-medium tracking-wide">Ambiente Local Seguro</span>
+            <i class="fa-solid fa-cloud text-brand-500 text-sm animate-pulseSlow"></i>
+            <span class="font-medium tracking-wide">Sincronizado com Nuvem</span>
         </div>
     </aside>
 
@@ -86,7 +86,7 @@
         <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200/40 dark:border-slate-700/30 pb-5">
             <div>
                 <h1 id="pageTitle" class="text-2xl md:text-3xl font-bold tracking-tight">Painel Financeiro</h1>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Gerenciamento offline seguro e em tempo real.</p>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Gerenciamento seguro e em tempo real via Firebase.</p>
             </div>
             <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
                 <select id="monthSelector" onchange="updateMetrics(); renderTransactions();" class="w-full sm:w-auto px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white shadow-sm cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 transition-all">
@@ -258,20 +258,89 @@
         </div>
     </div>
 
-    <script>
-        let state = {
-            transactions: JSON.parse(localStorage.getItem('fintech_txs')) || [
-                { id: 1, description: 'Faturamento Mensal', amount: 7500.00, type: 'receita', category: 'Salário', date: '2026-06-05' },
-                { id: 2, description: 'Aluguel Comercial', amount: 1900.00, type: 'despesa', category: 'Moradia', date: '2026-06-06' },
-                { id: 3, description: 'Logística e Insumos', amount: 840.20, type: 'despesa', category: 'Alimentação', date: '2026-06-10' },
-                { id: 4, description: 'Confraternização Time', amount: 350.00, type: 'despesa', category: 'Lazer', date: '2026-06-14' }
-            ]
+    <!-- Firebase Script Integrations via CDN (Compatíveis com HTML puro) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Configuração do Firebase fornecida
+        const firebaseConfig = {
+            apiKey: "AIzaSyAaW1Uean9dGmKT7xngvft5hsiEgY73iZQ",
+            authDomain: "fintech-pro-ed6bd.firebaseapp.com",
+            projectId: "fintech-pro-ed6bd",
+            storageBucket: "fintech-pro-ed6bd.firebasestorage.app",
+            messagingSenderId: "519059837621",
+            appId: "1:519059837621:web:9856b174b269b0d092e4fc"
         };
 
-        // Controlador Seguro SPA com Transições
+        // Inicializando o Firebase e Firestore
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const txCollectionRef = collection(db, "transactions");
+
+        // Estado reativo compartilhado
+        window.state = {
+            transactions: []
+        };
+
+        // Escuta em tempo real (Realtime Sync) do Firestore
+        const q = query(txCollectionRef, orderBy("date", "desc"));
+        onSnapshot(q, (snapshot) => {
+            window.state.transactions = [];
+            snapshot.forEach((doc) => {
+                window.state.transactions.push({ id: doc.id, ...doc.data() });
+            });
+            
+            // Atualizar UI dinamicamente sempre que o banco de dados mudar
+            updateMonthSelectorOptions();
+            updateMetrics();
+            renderTransactions();
+        }, (error) => {
+            console.error("Erro ao sincronizar dados: ", error);
+        });
+
+        // Tornar funções operacionais assíncronas globais para o HTML interagir
+        window.handleFormSubmit = async function(e) {
+            e.preventDefault();
+            
+            const desc = document.getElementById('txDescription').value.trim();
+            const amt = parseFloat(document.getElementById('txAmount').value);
+            const cat = document.getElementById('txCategory').value;
+            const date = document.getElementById('txDate').value;
+            const type = document.getElementById('txType').value;
+
+            if(!desc || isNaN(amt) || amt <= 0) return;
+
+            const newTx = { description: desc, amount: amt, type: type, category: cat, date: date };
+            
+            try {
+                // Adiciona direto no Firestore
+                await addDoc(txCollectionRef, newTx);
+                closeModal();
+                document.getElementById('transactionForm').reset();
+            } catch (err) {
+                alert("Erro ao salvar transação no banco de dados.");
+                console.error(err);
+            }
+        };
+
+        window.deleteTransaction = async function(id) {
+            if(confirm("Confirmar a exclusão permanente deste registro financeiro na nuvem?")) {
+                try {
+                    // Remove do Firestore pelo ID do Documento
+                    await deleteDoc(doc(db, "transactions", id));
+                } catch (err) {
+                    alert("Erro ao remover registro.");
+                    console.error(err);
+                }
+            }
+        };
+    </script>
+
+    <!-- Script de controle da Interface Visual -->
+    <script>
         function switchTab(e, tabId) {
             if(e) e.preventDefault();
-            
             document.querySelectorAll('.tab-content').forEach(section => section.classList.remove('active'));
             const activeSection = document.getElementById(`tab-${tabId}`);
             if(activeSection) activeSection.classList.add('active');
@@ -286,7 +355,6 @@
                 targetedAnchor.classList.remove('text-slate-600', 'dark:text-slate-400', 'font-medium');
                 targetedAnchor.classList.add('bg-brand-500/10', 'text-brand-500', 'font-semibold', 'shadow-sm');
             }
-            
             const titles = { dashboard: 'Painel Financeiro', transactions: 'Histórico de Transações', budgets: 'Orçamentos & Diretrizes' };
             document.getElementById('pageTitle').innerText = titles[tabId] || 'Painel Financeiro';
         }
@@ -309,6 +377,7 @@
 
         function updateMonthSelectorOptions() {
             const selector = document.getElementById('monthSelector');
+            if (!selector) return;
             const previousSelection = selector.value;
             const months = new Set();
             
@@ -316,11 +385,13 @@
             const currentYearMonth = today.toISOString().substring(0, 7);
             months.add(currentYearMonth);
 
-            state.transactions.forEach(tx => {
-                if (tx.date && tx.date.length >= 7) {
-                    months.add(tx.date.substring(0, 7));
-                }
-            });
+            if(window.state && window.state.transactions) {
+                window.state.transactions.forEach(tx => {
+                    if (tx.date && tx.date.length >= 7) {
+                        months.add(tx.date.substring(0, 7));
+                    }
+                });
+            }
 
             const sortedMonths = Array.from(months).sort((a, b) => b.localeCompare(a));
             const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
@@ -333,7 +404,6 @@
             });
 
             selector.innerHTML = htmlOptions;
-
             if (previousSelection && months.has(previousSelection)) {
                 selector.value = previousSelection;
             } else {
@@ -348,29 +418,31 @@
             let lifestyleExpenses = 0;
             let otherExpenses = 0;
 
-            const selectedMonth = document.getElementById('monthSelector').value;
+            const selector = document.getElementById('monthSelector');
+            const selectedMonth = selector ? selector.value : new Date().toISOString().substring(0, 7);
 
-            state.transactions.forEach(tx => {
-                if (selectedMonth !== 'all') {
-                    if (tx.date.substring(0, 7) !== selectedMonth) return;
-                }
-
-                if (tx.type === 'receita') {
-                    incomes += tx.amount;
-                } else {
-                    expenses += tx.amount;
-                    if (['Alimentação', 'Moradia', 'Transporte'].includes(tx.category)) {
-                        essentialsExpenses += tx.amount;
-                    } else if (tx.category === 'Lazer') {
-                        lifestyleExpenses += tx.amount;
-                    } else {
-                        otherExpenses += tx.amount;
+            if(window.state && window.state.transactions) {
+                window.state.transactions.forEach(tx => {
+                    if (selectedMonth !== 'all') {
+                        if (tx.date.substring(0, 7) !== selectedMonth) return;
                     }
-                }
-            });
+
+                    if (tx.type === 'receita') {
+                        incomes += tx.amount;
+                    } else {
+                        expenses += tx.amount;
+                        if (['Alimentação', 'Moradia', 'Transporte'].includes(tx.category)) {
+                            essentialsExpenses += tx.amount;
+                        } else if (tx.category === 'Lazer') {
+                            lifestyleExpenses += tx.amount;
+                        } else {
+                            otherExpenses += tx.amount;
+                        }
+                    }
+                });
+            }
 
             const balance = incomes - expenses;
-
             document.getElementById('totalBalance').innerText = formatCurrency(balance);
             document.getElementById('totalIncomes').innerText = formatCurrency(incomes);
             document.getElementById('totalExpenses').innerText = formatCurrency(expenses);
@@ -418,7 +490,6 @@
             ];
 
             tbody.innerHTML = '';
-
             targets.forEach(item => {
                 const limitAmount = incomeBase * (item.pct / 100);
                 const consumptionPct = limitAmount > 0 ? Math.round((item.current / limitAmount) * 100) : (item.current > 0 ? 100 : 0);
@@ -466,10 +537,12 @@
             }
 
             const categoriesMap = {};
-            state.transactions.filter(t => t.type === 'despesa').forEach(tx => {
-                if (selectedMonth !== 'all' && tx.date.substring(0, 7) !== selectedMonth) return;
-                categoriesMap[tx.category] = (categoriesMap[tx.category] || 0) + tx.amount;
-            });
+            if(window.state && window.state.transactions) {
+                window.state.transactions.filter(t => t.type === 'despesa').forEach(tx => {
+                    if (selectedMonth !== 'all' && tx.date.substring(0, 7) !== selectedMonth) return;
+                    categoriesMap[tx.category] = (categoriesMap[tx.category] || 0) + tx.amount;
+                });
+            }
 
             chartContainer.innerHTML = '';
             for (let cat in categoriesMap) {
@@ -494,11 +567,19 @@
         function renderTransactions() {
             const recentList = document.getElementById('recentTransactionsList');
             const fullList = document.getElementById('fullTransactionsList');
-            const searchVal = document.getElementById('searchInput').value.toLowerCase();
-            const filterType = document.getElementById('filterType').value;
-            const selectedMonth = document.getElementById('monthSelector').value;
+            if(!recentList || !fullList) return;
 
-            const sortedTxs = [...state.transactions].sort((a,b) => new Date(b.date) - new Date(a.date));
+            const searchInput = document.getElementById('searchInput');
+            const searchVal = searchInput ? searchInput.value.toLowerCase() : "";
+            
+            const filterTypeElem = document.getElementById('filterType');
+            const filterType = filterTypeElem ? filterTypeElem.value : "all";
+            
+            const monthSelector = document.getElementById('monthSelector');
+            const selectedMonth = monthSelector ? monthSelector.value : "all";
+
+            const txsArray = (window.state && window.state.transactions) ? window.state.transactions : [];
+            const sortedTxs = [...txsArray].sort((a,b) => new Date(b.date) - new Date(a.date));
 
             const filteredTxs = sortedTxs.filter(tx => {
                 const matchesSearch = tx.description.toLowerCase().includes(searchVal) || tx.category.toLowerCase().includes(searchVal);
@@ -522,7 +603,7 @@
                         <span class="font-bold text-sm ${tx.type === 'receita' ? 'text-emerald-500' : 'text-slate-900 dark:text-white'}">
                             ${tx.type === 'receita' ? '+' : '-'} ${formatCurrency(tx.amount)}
                         </span>
-                        <button onclick="deleteTransaction(${tx.id})" class="text-slate-400 hover:text-rose-500 dark:hover:text-slate-500 dark:hover:text-rose-400 transition-all text-xs p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg opacity-80 hover:opacity-100" title="Estornar lançamento">
+                        <button onclick="deleteTransaction('${tx.id}')" class="text-slate-400 hover:text-rose-500 dark:hover:text-slate-500 dark:hover:text-rose-400 transition-all text-xs p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg opacity-80 hover:opacity-100" title="Estornar lançamento">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </div>
@@ -533,44 +614,6 @@
 
             recentList.innerHTML = dashboardTxs.slice(0, 4).map(renderItem).join('') || `<p class="text-center p-6 text-sm text-slate-400 font-medium">Nenhum registro encontrado para este mês.</p>`;
             fullList.innerHTML = filteredTxs.map(renderItem).join('') || `<p class="text-center p-6 text-sm text-slate-400 font-medium">Nenhum registro correspondente encontrado.</p>`;
-        }
-
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            
-            const desc = document.getElementById('txDescription').value.trim();
-            const amt = parseFloat(document.getElementById('txAmount').value);
-            const cat = document.getElementById('txCategory').value;
-            const date = document.getElementById('txDate').value;
-            const type = document.getElementById('txType').value;
-
-            if(!desc || isNaN(amt) || amt <= 0) return;
-
-            const newTx = { id: Date.now(), description: desc, amount: amt, type: type, category: cat, date: date };
-            state.transactions.push(newTx);
-            
-            const insertedMonth = date.substring(0, 7);
-            localStorage.setItem('fintech_txs', JSON.stringify(state.transactions));
-            updateMonthSelectorOptions();
-            document.getElementById('monthSelector').value = insertedMonth;
-            
-            saveAndRefresh();
-            closeModal();
-            document.getElementById('transactionForm').reset();
-        }
-
-        function deleteTransaction(id) {
-            if(confirm("Confirmar a exclusão permanente deste registro financeiro?")) {
-                state.transactions = state.transactions.filter(tx => tx.id !== id);
-                saveAndRefresh();
-            }
-        }
-
-        function saveAndRefresh() {
-            localStorage.setItem('fintech_txs', JSON.stringify(state.transactions));
-            updateMonthSelectorOptions();
-            updateMetrics();
-            renderTransactions();
         }
 
         function openModal(type) {
@@ -612,7 +655,8 @@
         });
 
         function exportData() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state.transactions, null, 2));
+            const txsArray = (window.state && window.state.transactions) ? window.state.transactions : [];
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(txsArray, null, 2));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
             downloadAnchor.setAttribute("download", `FintechPro_Database_${new Date().toISOString().split('T')[0]}.json`);
