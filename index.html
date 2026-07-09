@@ -238,7 +238,9 @@
                             <option value="Alimentação">Alimentação (Essencial)</option>
                             <option value="Moradia">Moradia (Essencial)</option>
                             <option value="Transporte">Transporte (Essencial)</option>
+                            <option value="Farmácia">Farmácia (Essencial)</option>
                             <option value="Lazer">Lazer (Estilo de Vida)</option>
+                            <option value="Dinheiro">Dinheiro (Estilo de Vida)</option>
                             <option value="Salário">Salário / Proventos</option>
                             <option value="Outros">Outras Despesas</option>
                         </select>
@@ -258,7 +260,6 @@
         </div>
     </div>
 
-    <!-- Firebase Script Integrations via CDN (Compatíveis com HTML puro) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -337,7 +338,6 @@
         };
     </script>
 
-    <!-- Script de controle da Interface Visual -->
     <script>
         function switchTab(e, tabId) {
             if(e) e.preventDefault();
@@ -431,9 +431,9 @@
                         incomes += tx.amount;
                     } else {
                         expenses += tx.amount;
-                        if (['Alimentação', 'Moradia', 'Transporte'].includes(tx.category)) {
+                        if (['Alimentação', 'Moradia', 'Transporte', 'Farmácia'].includes(tx.category)) {
                             essentialsExpenses += tx.amount;
-                        } else if (tx.category === 'Lazer') {
+                        } else if (['Lazer', 'Dinheiro'].includes(tx.category)) {
                             lifestyleExpenses += tx.amount;
                         } else {
                             otherExpenses += tx.amount;
@@ -484,8 +484,8 @@
             const incomeBase = totalIncomes > 0 ? totalIncomes : 0;
 
             const targets = [
-                { name: 'Necessidades Essenciais (Moradia, Alimentação, Transporte)', pct: 50, current: essentials },
-                { name: 'Estilo de Vida e Variados (Lazer, Hobbies, Compras)', pct: 30, current: lifestyle },
+                { name: 'Necessidades Essenciais (Moradia, Alimentação, Transporte, Farmácia)', pct: 50, current: essentials },
+                { name: 'Estilo de Vida e Variados (Lazer, Hobbies, Dinheiro em Espécie)', pct: 30, current: lifestyle },
                 { name: 'Aportes e Outros Fluxos Não Classificados', pct: 20, current: others }
             ];
 
