@@ -35,8 +35,7 @@
         }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght={300;400;500;600;700}&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -44,14 +43,6 @@
         ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeInUp 0.4s ease-out forwards; }
-        
-        .ai-content h3 { font-size: 1.125rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem; color: #f8fafc; }
-        .ai-content p { margin-bottom: 0.75rem; line-height: 1.6; }
-        .ai-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; }
-        .ai-content li { margin-bottom: 0.25rem; }
-        .ai-content strong { color: #22c55e; }
-        html.light .ai-content h3 { color: #0f172a; }
-        html.light .ai-content strong { color: #16a34a; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-darkBg dark:text-slate-100 min-h-screen flex flex-col md:flex-row antialiased">
@@ -81,9 +72,6 @@
                 <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 font-medium rounded-xl transition-all duration-200" onclick="switchTab(event, 'budgets')">
                     <i class="fa-solid fa-bullseye w-5 text-center"></i> Orçamentos
                 </a>
-                <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 font-medium rounded-xl transition-all duration-200" onclick="switchTab(event, 'ai')">
-                    <i class="fa-solid fa-robot w-5 text-center bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent"></i> Conselheiro IA
-                </a>
             </nav>
         </div>
 
@@ -112,6 +100,7 @@
             </div>
         </header>
 
+        <!-- DASHBOARD TAB -->
         <section id="tab-dashboard" class="tab-content active space-y-6">
              <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
                 <div class="bg-white dark:bg-darkCard p-6 rounded-2xl border border-slate-200/60 dark:border-slate-700/40 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300">
@@ -168,12 +157,13 @@
             <div class="bg-white dark:bg-darkCard rounded-2xl border border-slate-200/60 dark:border-slate-700/40 shadow-sm overflow-hidden">
                 <div class="p-6 border-b border-slate-100 dark:border-slate-800/60 flex justify-between items-center">
                     <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100">Últimos Lançamentos do Mês</h3>
-                    <button onclick="simulateTabClick(1)" class="text-sm text-brand-500 hover:text-brand-600 font-semibold hover:underline transition-all">Ver Histórico Completo</button>
+                    <button onclick="switchTab(null, 'transactions')" class="text-sm text-brand-500 hover:text-brand-600 font-semibold hover:underline transition-all">Ver Histórico Completo</button>
                 </div>
                 <div class="divide-y divide-slate-100 dark:divide-slate-800/60" id="recentTransactionsList"></div>
             </div>
         </section>
 
+        <!-- TRANSACTIONS TAB -->
         <section id="tab-transactions" class="tab-content space-y-6">
             <div class="bg-white dark:bg-darkCard p-4 rounded-2xl border border-slate-200/60 dark:border-slate-700/40 shadow-sm flex flex-col sm:flex-row gap-3">
                 <div class="relative flex-1">
@@ -193,6 +183,7 @@
             </div>
         </section>
 
+        <!-- BUDGETS TAB -->
         <section id="tab-budgets" class="tab-content space-y-6">
             <div class="bg-white dark:bg-darkCard p-6 rounded-2xl border border-slate-200/60 dark:border-slate-700/40 shadow-sm">
                 <div class="mb-6">
@@ -216,42 +207,9 @@
             </div>
         </section>
 
-        <section id="tab-ai" class="tab-content space-y-6">
-            <div class="bg-gradient-to-br from-slate-900 to-slate-800 dark:from-darkCard dark:to-slate-900 p-8 rounded-2xl border border-slate-700 shadow-lg relative overflow-hidden">
-                <div class="absolute -right-20 -top-20 w-64 h-64 bg-brand-500/20 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="absolute -left-20 -bottom-20 w-64 h-64 bg-amber-500/20 rounded-full blur-3xl pointer-events-none"></div>
-                
-                <div class="relative z-10 flex flex-col md:flex-row gap-8 items-center md:items-start">
-                    <div class="w-24 h-24 rounded-full bg-slate-800 flex items-center justify-center border-4 border-slate-700 shadow-xl shrink-0">
-                        <i class="fa-solid fa-brain text-4xl bg-gradient-to-r from-amber-400 to-brand-400 bg-clip-text text-transparent"></i>
-                    </div>
-                    
-                    <div class="flex-1 text-center md:text-left">
-                        <h2 class="text-2xl font-bold text-white mb-2">Mentoria: Pai Rico, Pai Pobre</h2>
-                        <p class="text-slate-300 text-sm leading-relaxed mb-6 max-w-2xl">
-                            Esta Inteligência Artificial foi treinada com a filosofia de Robert Kiyosaki. Ela avaliará suas receitas e despesas do mês selecionado, classificará suas escolhas entre "Ativos" e "Passivos", e dirá se você está no caminho para sair da Corrida dos Ratos.
-                        </p>
-                        
-                        <button onclick="requestAIAnalysis()" id="btn-ai-analyze" class="px-6 py-3 bg-gradient-to-r from-brand-500 to-emerald-600 hover:from-brand-400 hover:to-emerald-500 text-white font-bold rounded-xl shadow-lg shadow-brand-500/30 transition-all active:scale-95 flex items-center justify-center gap-3 w-full md:w-auto">
-                            <i class="fa-solid fa-bolt"></i> Analisar Meu Mês Atual
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="ai-response-container" class="hidden bg-white dark:bg-darkCard p-6 md:p-8 rounded-2xl border border-slate-200/60 dark:border-slate-700/40 shadow-sm relative">
-                <div id="ai-loading" class="hidden flex flex-col items-center justify-center py-10 space-y-4">
-                    <div class="w-10 h-10 border-4 border-slate-200 dark:border-slate-700 border-t-brand-500 rounded-full animate-spin"></div>
-                    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">O Mentor está avaliando seu fluxo de caixa...</p>
-                </div>
-
-                <div id="ai-content" class="ai-content text-slate-700 dark:text-slate-300 text-sm md:text-base hidden">
-                </div>
-            </div>
-        </section>
-
     </main>
 
+    <!-- MODAL DE TRANSAÇÃO -->
     <div id="transactionModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
         <div class="bg-white dark:bg-darkCard w-full max-w-md rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300" id="modalContent">
             <div class="p-6 border-b border-slate-100 dark:border-slate-800/80 flex justify-between items-center">
@@ -295,6 +253,7 @@
         </div>
     </div>
 
+    <!-- FIREBASE MODULE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -339,21 +298,19 @@
                 closeModal();
                 document.getElementById('transactionForm').reset();
             } catch (err) {
-                alert("Erro ao salvar.");
+                alert("Erro ao salvar dados.");
             }
         };
 
         window.deleteTransaction = async function(id) {
-            if(confirm("Excluir este registro?")) {
+            if(confirm("Deseja realmente excluir este registro?")) {
                 await deleteDoc(doc(db, "transactions", id));
             }
         };
     </script>
 
+    <!-- CORE JAVASCRIPT -->
     <script>
-        // CONFIGURAÇÃO DA IA: Chave inserida conforme solicitado
-        const GEMINI_API_KEY = "AQ.Ab8RN6ICkXm7Nlu92XH3ENGPerEU76SmxB9DN9UHiw1QzLnbsw";
-
         function switchTab(e, tabId) {
             if(e) e.preventDefault();
             document.querySelectorAll('.tab-content').forEach(section => section.classList.remove('active'));
@@ -370,16 +327,17 @@
                 targetedAnchor.classList.remove('text-slate-600', 'dark:text-slate-400', 'font-medium');
                 targetedAnchor.classList.add('bg-brand-500/10', 'text-brand-500', 'font-semibold', 'shadow-sm');
             }
-            const titles = { dashboard: 'Painel Financeiro', transactions: 'Histórico de Transações', budgets: 'Orçamentos & Diretrizes', ai: 'Mentoria Pai Rico' };
+            const titles = { dashboard: 'Painel Financeiro', transactions: 'Histórico de Transações', budgets: 'Orçamentos & Diretrizes' };
             document.getElementById('pageTitle').innerText = titles[tabId] || 'Painel Financeiro';
         }
 
-        function sanitizeString(str) { return str.replace(/[&<>"']/g, match => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;' })[match]); }
+        function sanitizeString(str) { return str ? str.replace(/[&<>"']/g, match => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;' })[match]) : ''; }
         function formatCurrency(value) { return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
         
-        function getMonthDataForAI() {
+        function getMonthData() {
             let incomes = 0; let essentials = 0; let lifestyle = 0; let others = 0;
-            const selectedMonth = document.getElementById('monthSelector').value || new Date().toISOString().substring(0, 7);
+            const monthSelector = document.getElementById('monthSelector');
+            const selectedMonth = monthSelector ? monthSelector.value : new Date().toISOString().substring(0, 7);
             
             if(window.state && window.state.transactions) {
                 window.state.transactions.forEach(tx => {
@@ -393,88 +351,6 @@
                 });
             }
             return { incomes, expenses: essentials + lifestyle + others, essentials, lifestyle, others };
-        }
-
-        async function requestAIAnalysis() {
-            if (!GEMINI_API_KEY || GEMINI_API_KEY.trim() === "" || GEMINI_API_KEY === "SUA_CHAVE_AQUI") {
-                alert("A chave da API não foi detectada no código.");
-                return;
-            }
-
-            const container = document.getElementById('ai-response-container');
-            const loading = document.getElementById('ai-loading');
-            const content = document.getElementById('ai-content');
-            const btn = document.getElementById('btn-ai-analyze');
-
-            container.classList.remove('hidden');
-            loading.classList.remove('hidden');
-            content.classList.add('hidden');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Processando...';
-
-            const data = getMonthDataForAI();
-            const savingsRate = data.incomes > 0 ? Math.round(((data.incomes - data.expenses) / data.incomes) * 100) : 0;
-
-            const promptStr = `
-            Você é um Mentor Financeiro inspirado diretamente na filosofia de Robert Kiyosaki, autor do livro "Pai Rico, Pai Pobre".
-            Analise os dados financeiros do meu mês atual e me dê um feedback direto, encorajador, porém realista.
-
-            MEUS DADOS DESTE MÊS:
-            - Receita Total: R$ ${data.incomes.toFixed(2)}
-            - Despesas Essenciais: R$ ${data.essentials.toFixed(2)}
-            - Despesas de Estilo de Vida: R$ ${data.lifestyle.toFixed(2)}
-            - Outras Despesas: R$ ${data.others.toFixed(2)}
-            - Minha Capacidade de Poupança atual: ${savingsRate}%
-            
-            SUA TAREFA:
-            1. Analise se meu fluxo de caixa atual reflete uma pessoa presa na "Corrida dos Ratos" ou alguém a caminho da liberdade financeira.
-            2. Fale sobre a importância de usar esse saldo retido para comprar "Ativos" em vez de "Passivos".
-            3. Dê 2 conselhos práticos e rápidos.
-
-            Use tom de mentor, estruturando a resposta com títulos, textos em negrito nos pontos-chave e seja conciso. Responda em Markdown.
-            `;
-
-            // Montando a URL de forma segura removendo espaços acidentais da chave
-            const cleanKey = GEMINI_API_KEY.trim();
-            const apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + cleanKey;
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: promptStr }] }]
-                    })
-                });
-
-                const apiData = await response.json();
-                
-                if (!response.ok) {
-                    console.error("Erro detalhado da API:", apiData);
-                    content.innerHTML = `
-                        <div class="bg-rose-500/10 p-4 rounded-xl border border-rose-500/20">
-                            <p class="text-rose-500 font-bold mb-2"><i class="fa-solid fa-triangle-exclamation"></i> O Google recusou a conexão (Erro ${response.status})</p>
-                            <p class="text-rose-400 text-sm font-mono break-words">${apiData.error?.message || 'Erro desconhecido.'}</p>
-                            <p class="text-slate-400 text-xs mt-3">Aguarde cerca de 10 minutos após criar a chave no Google para que ela seja ativada. Se o erro persistir, gere uma nova chave.</p>
-                        </div>`;
-                    return;
-                }
-
-                if (apiData.candidates && apiData.candidates.length > 0) {
-                    const aiText = apiData.candidates[0].content.parts[0].text;
-                    content.innerHTML = marked.parse(aiText);
-                } else {
-                    content.innerHTML = '<p class="text-rose-500">A IA não enviou uma resposta válida.</p>';
-                }
-            } catch (error) {
-                console.error(error);
-                content.innerHTML = `<p class="text-rose-500">Erro de rede: Não foi possível conectar ao servidor da IA. (${error.message})</p>`;
-            } finally {
-                loading.classList.add('hidden');
-                content.classList.remove('hidden');
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fa-solid fa-bolt"></i> Refazer Análise';
-            }
         }
 
         function updateMonthSelectorOptions() {
@@ -500,7 +376,7 @@
         }
 
         function updateMetrics() {
-            const data = getMonthDataForAI();
+            const data = getMonthData();
             const incomes = data.incomes; const expenses = data.expenses;
             document.getElementById('totalBalance').innerText = formatCurrency(incomes - expenses);
             document.getElementById('totalIncomes').innerText = formatCurrency(incomes);
@@ -536,6 +412,7 @@
 
         function renderBudgetTable(totalIncomes, essentials, lifestyle, others) {
             const tbody = document.getElementById('budgetTableBody');
+            if(!tbody) return;
             const incomeBase = totalIncomes > 0 ? totalIncomes : 0;
             const targets = [
                 { name: 'Necessidades Essenciais', pct: 50, current: essentials },
@@ -563,6 +440,7 @@
 
         function renderCharts(totalExpenses, selectedMonth) {
             const chartContainer = document.getElementById('chartContainer');
+            if(!chartContainer) return;
             if (totalExpenses === 0) { chartContainer.innerHTML = `<p class="text-sm text-slate-400 text-center py-8">Nenhuma despesa para gerar o demonstrativo.</p>`; return; }
             const categoriesMap = {};
             if(window.state && window.state.transactions) {
