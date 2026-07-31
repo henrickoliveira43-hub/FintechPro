@@ -121,7 +121,6 @@
         }
     </style>
     <script>
-        // Inicialização garantida antes dos scripts assíncronos
         window.state = { transactions: [], loading: true };
     </script>
 </head>
@@ -150,7 +149,7 @@
                     <i class="fa-solid fa-list-check w-5 text-center"></i> Transações
                 </a>
                 <a href="#" class="nav-link flex items-center gap-3 px-4 py-3 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 font-medium rounded-xl transition-all duration-200" onclick="switchTab(event, 'budgets')">
-                    <i class="fa-solid fa-bullseye w-5 text-center"></i> Orçamentos
+                    <i class="fa-solid fa-bullseye w-5 text-center"></i> Orçamentos & Aportes
                 </a>
             </nav>
         </div>
@@ -178,7 +177,6 @@
                         <i class="fa-solid fa-chevron-down text-xs text-slate-400 ml-1 transition-transform" id="monthChevron"></i>
                     </button>
                     
-                    <!-- DROPDOWN DO CALENDÁRIO ANUAL -->
                     <div id="monthDropdown" class="absolute right-0 sm:right-0 left-0 sm:left-auto mt-2 w-full sm:w-[320px] bg-white dark:bg-darkCard border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl z-50 hidden p-4">
                         <div class="flex items-center justify-between mb-4">
                             <button type="button" onclick="changeCalendarYear(-1)" class="year-nav-btn" title="Ano anterior">
@@ -205,7 +203,7 @@
                     <i class="fa-solid fa-plus-circle"></i> Receita
                 </button>
                 <button onclick="openModal('despesa')" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-semibold rounded-xl shadow-md shadow-rose-600/10 hover:shadow-rose-600/20 active:scale-95 transition-all text-sm">
-                    <i class="fa-solid fa-minus-circle"></i> Despesa
+                    <i class="fa-solid fa-minus-circle"></i> Despesa / Aporte
                 </button>
             </div>
         </header>
@@ -228,7 +226,7 @@
                     </div>
                 </div>
                 <div class="bg-white dark:bg-darkCard p-6 rounded-2xl border border-slate-200/60 dark:border-slate-700/40 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300">
-                    <p class="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">Despesas no Período</p>
+                    <p class="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">Despesas / Saídas</p>
                     <p id="totalExpenses" class="text-2xl md:text-3xl font-bold mt-2 text-rose-500 tracking-tight">R$ 0,00</p>
                     <div class="absolute -right-2 -bottom-4 text-rose-500/5 text-7xl font-bold pointer-events-none group-hover:scale-110 transition-transform duration-300">
                         <i class="fa-solid fa-arrow-trend-down"></i>
@@ -249,16 +247,16 @@
                 
                 <div class="bg-white dark:bg-darkCard p-6 rounded-2xl border border-slate-200/60 dark:border-slate-700/40 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-300">
                     <div>
-                        <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100 mb-4">Meta de Retenção</h3>
+                        <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100 mb-4">Meta de Aportes</h3>
                         <div class="space-y-3">
                             <div class="flex justify-between text-sm font-medium">
-                                <span class="text-slate-400">Capacidade de Poupança</span>
+                                <span class="text-slate-400">Taxa de Investimento Real</span>
                                 <span id="metaPercent" class="font-bold text-brand-500 transition-colors duration-300">0%</span>
                             </div>
                             <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-3 overflow-hidden">
                                 <div id="metaProgressBar" class="h-full rounded-full transition-all duration-500" style="width: 0%"></div>
                             </div>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed pt-1">Sua diretriz recomendada é reter ao menos <span class="font-semibold text-brand-500">20%</span> de suas receitas totais para aportes, fundos de segurança ou investimentos futuros.</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed pt-1">Sua diretriz de poupança/investimentos é aportar ao menos <span class="font-semibold text-brand-500">20%</span> da sua renda total (Liquidez Diária, Criptos ou outros).</p>
                         </div>
                     </div>
                 </div>
@@ -286,7 +284,7 @@
                     <select id="filterType" onchange="renderTransactions()" class="px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer text-slate-900 dark:text-white hover:border-slate-300 dark:hover:border-slate-600 transition-all">
                         <option value="all">Todos os fluxos</option>
                         <option value="receita">Apenas Receitas (+)</option>
-                        <option value="despesa">Apenas Despesas (-)</option>
+                        <option value="despesa">Apenas Saídas (-)</option>
                     </select>
                     <div class="relative">
                         <input type="month" id="periodFilter" onchange="handlePeriodFilterChange()" class="px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer text-slate-900 dark:text-white hover:border-slate-300 dark:hover:border-slate-600 transition-all">
@@ -307,18 +305,18 @@
         <section id="tab-budgets" class="tab-content space-y-6">
             <div class="bg-white dark:bg-darkCard p-6 rounded-2xl border border-slate-200/60 dark:border-slate-700/40 shadow-sm">
                 <div class="mb-6">
-                    <h3 class="font-bold text-xl text-slate-800 dark:text-slate-100 mb-1">Matriz de Limites de Gastos</h3>
-                    <p class="text-sm text-slate-500 dark:text-slate-400">Análise corporativa com base no modelo de alocação patrimonial macro <span class="font-semibold text-slate-700 dark:text-slate-300">(50% Essenciais, 30% Estilo de Vida, 20% Poupança)</span> adaptada em tempo real para o mês atual.</p>
+                    <h3 class="font-bold text-xl text-slate-800 dark:text-slate-100 mb-1">Matriz de Limites e Aportes</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Análise corporativa baseada na alocação macro <span class="font-semibold text-slate-700 dark:text-slate-300">(50% Essenciais, 30% Estilo de Vida, 20% Aportes)</span> com detalhamento de Investimentos.</p>
                 </div>
                 <div class="overflow-x-auto border border-slate-100 dark:border-slate-800 rounded-xl shadow-sm">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-50 dark:bg-slate-800/40 border-b border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                                <th class="p-4 pl-5">Diretriz de Alocação</th>
-                                <th class="p-4">Teto Recomendado</th>
-                                <th class="p-4">Valor Consumido</th>
+                                <th class="p-4 pl-5">Diretriz / Tipo de Aporte</th>
+                                <th class="p-4">Teto / Meta Recomendada</th>
+                                <th class="p-4">Valor Consumido / Aportado</th>
                                 <th class="p-4">Alocação Atual</th>
-                                <th class="p-4 pr-5 text-right">Status de Risco</th>
+                                <th class="p-4 pr-5 text-right">Status</th>
                             </tr>
                         </thead>
                         <tbody id="budgetTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50 text-sm">
@@ -342,7 +340,7 @@
                 <input type="hidden" id="txType" value="receita">
                 <div>
                     <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Descrição do Item</label>
-                    <input type="text" id="txDescription" required maxlength="50" placeholder="Ex: NF-e #1092, Supermercado" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white transition-all">
+                    <input type="text" id="txDescription" required maxlength="50" placeholder="Ex: Aporte Tesouro Selic, Bitcoin, Supermercado" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white transition-all">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
@@ -352,7 +350,6 @@
                     <div>
                         <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Categoria</label>
                         <select id="txCategory" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white transition-all cursor-pointer">
-                            <!-- Opções dinâmicas injetadas via JavaScript -->
                         </select>
                     </div>
                 </div>
@@ -441,7 +438,6 @@
 
     <!-- CORE JAVASCRIPT -->
     <script>
-        // Funções para manipulação segura de datas no fuso horário local
         function getLocalDateString() {
             const d = new Date();
             const year = d.getFullYear();
@@ -457,29 +453,35 @@
             return `${year}-${month}`;
         }
 
-        // Estado global de interface
         let selectedMonthValue = getLocalMonthString();
         let monthDropdownOpen = false;
         let calendarYear = new Date().getFullYear();
         const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
         const monthNamesFull = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
+        // Categorias incluindo APORTES explícitos
         const categoriesByType = {
             receita: [
                 { value: 'Salário', label: 'Salário / Proventos' },
                 { value: 'Freelance', label: 'Freelance / Serviços' },
-                { value: 'Investimentos', label: 'Rendimentos / Investimentos' },
+                { value: 'Investimentos', label: 'Rendimentos de Investimentos' },
                 { value: 'Vendas', label: 'Vendas' },
                 { value: 'Outros', label: 'Outras Receitas' }
             ],
             despesa: [
-                { value: 'Alimentação', label: 'Alimentação' },
-                { value: 'Moradia', label: 'Moradia' },
-                { value: 'Transporte', label: 'Transporte' },
-                { value: 'Farmácia', label: 'Farmácia' },
-                { value: 'Lazer', label: 'Lazer' },
+                // Essenciais
+                { value: 'Alimentação', label: 'Alimentação (Essencial)' },
+                { value: 'Moradia', label: 'Moradia (Essencial)' },
+                { value: 'Transporte', label: 'Transporte (Essencial)' },
+                { value: 'Farmácia', label: 'Farmácia (Essencial)' },
+                // Estilo de Vida
+                { value: 'Lazer', label: 'Lazer (Estilo de Vida)' },
                 { value: 'Dinheiro', label: 'Saques / Dinheiro' },
-                { value: 'Outros', label: 'Outras Despesas' }
+                { value: 'Outros', label: 'Outras Despesas' },
+                // Aportes & Investimentos
+                { value: 'Aporte: Liquidez Diária', label: '📈 Aporte: Liquidez Diária' },
+                { value: 'Aporte: Criptomoedas', label: '🪙 Aporte: Criptomoedas' },
+                { value: 'Aporte: Outros', label: '💼 Aporte: Outros Investimentos' }
             ]
         };
 
@@ -499,7 +501,7 @@
                 targetedAnchor.classList.remove('text-slate-600', 'dark:text-slate-400', 'font-medium');
                 targetedAnchor.classList.add('bg-brand-500/10', 'text-brand-500', 'font-semibold', 'shadow-sm');
             }
-            const titles = { dashboard: 'Painel Financeiro', transactions: 'Histórico de Transações', budgets: 'Orçamentos & Diretrizes' };
+            const titles = { dashboard: 'Painel Financeiro', transactions: 'Histórico de Transações', budgets: 'Orçamentos & Aportes' };
             document.getElementById('pageTitle').innerText = titles[tabId] || 'Painel Financeiro';
             document.title = `${titles[tabId] || 'Painel'} | Fintech Pro`;
         }
@@ -526,24 +528,53 @@
         }
 
         function getMonthData() {
-            let incomes = 0; let essentials = 0; let lifestyle = 0; let others = 0;
+            let incomes = 0; 
+            let essentials = 0; 
+            let lifestyle = 0; 
+            let aporteLiquidez = 0;
+            let aporteCripto = 0;
+            let aporteOutros = 0;
+            
             const selectedMonth = selectedMonthValue;
             
             if(window.state && window.state.transactions) {
                 window.state.transactions.forEach(tx => {
                     const txMonth = safeDatePrefix(tx.date);
                     if (selectedMonth !== 'all' && txMonth !== selectedMonth) return;
+                    
+                    const amt = parseFloat(tx.amount) || 0;
                     if (tx.type === 'receita') {
-                        incomes += parseFloat(tx.amount) || 0;
+                        incomes += amt;
                     } else {
-                        const amt = parseFloat(tx.amount) || 0;
-                        if (['Alimentação', 'Moradia', 'Transporte', 'Farmácia'].includes(tx.category)) essentials += amt;
-                        else if (['Lazer', 'Dinheiro'].includes(tx.category)) lifestyle += amt;
-                        else others += amt;
+                        const cat = tx.category || '';
+                        if (['Alimentação', 'Moradia', 'Transporte', 'Farmácia'].includes(cat)) {
+                            essentials += amt;
+                        } else if (cat === 'Aporte: Liquidez Diária') {
+                            aporteLiquidez += amt;
+                        } else if (cat === 'Aporte: Criptomoedas') {
+                            aporteCripto += amt;
+                        } else if (cat === 'Aporte: Outros' || cat.startsWith('Aporte')) {
+                            aporteOutros += amt;
+                        } else {
+                            lifestyle += amt; // Lazer, Dinheiro, Outros
+                        }
                     }
                 });
             }
-            return { incomes, expenses: essentials + lifestyle + others, essentials, lifestyle, others };
+            
+            const totalAportes = aporteLiquidez + aporteCripto + aporteOutros;
+            const totalOutflows = essentials + lifestyle + totalAportes;
+            
+            return { 
+                incomes, 
+                expenses: totalOutflows, 
+                essentials, 
+                lifestyle, 
+                aporteLiquidez, 
+                aporteCripto, 
+                aporteOutros, 
+                totalAportes 
+            };
         }
 
         function updateSyncStatus(connected) {
@@ -700,14 +731,15 @@
             renderTransactions();
         }
 
-        // ============ MÉTRICAS ============
+        // ============ MÉTRICAS & APORTES ============
         function updateMetrics() {
             const data = getMonthData();
             const incomes = data.incomes; 
-            const expenses = data.expenses;
-            document.getElementById('totalBalance').innerText = formatCurrency(incomes - expenses);
+            const totalOutflows = data.expenses;
+            
+            document.getElementById('totalBalance').innerText = formatCurrency(incomes - totalOutflows);
             document.getElementById('totalIncomes').innerText = formatCurrency(incomes);
-            document.getElementById('totalExpenses').innerText = formatCurrency(expenses);
+            document.getElementById('totalExpenses').innerText = formatCurrency(totalOutflows);
 
             const metaPercentElem = document.getElementById('metaPercent');
             const metaBarElem = document.getElementById('metaProgressBar');
@@ -717,15 +749,16 @@
                 chartLabel.innerText = selectedMonthValue === 'all' ? 'Geral (Todos)' : 'Mensal';
             }
 
+            // Calcula porcentagem baseada nos APORTES EFETUADOS
             if (incomes > 0) {
-                const savedPercent = Math.min(Math.round(((incomes - expenses) / incomes) * 100), 100);
-                const positiveSaved = savedPercent > 0 ? savedPercent : 0;
-                metaPercentElem.innerText = `${positiveSaved}%`;
-                metaBarElem.style.width = `${positiveSaved}%`;
-                if (positiveSaved >= 20) {
+                const aportesPercent = Math.min(Math.round((data.totalAportes / incomes) * 100), 100);
+                metaPercentElem.innerText = `${aportesPercent}%`;
+                metaBarElem.style.width = `${aportesPercent}%`;
+                
+                if (aportesPercent >= 20) {
                     metaPercentElem.className = "font-bold text-brand-500 transition-colors duration-300";
                     metaBarElem.className = "bg-brand-500 h-full rounded-full transition-all duration-500 shadow-sm shadow-brand-500/20";
-                } else if (positiveSaved > 0) {
+                } else if (aportesPercent > 0) {
                     metaPercentElem.className = "font-bold text-amber-500 transition-colors duration-300";
                     metaBarElem.className = "bg-amber-500 h-full rounded-full transition-all duration-500 shadow-sm shadow-amber-500/20";
                 } else {
@@ -738,52 +771,69 @@
                 metaBarElem.style.width = `0%`;
                 metaBarElem.className = "bg-slate-300 dark:bg-slate-700 h-full rounded-full transition-all duration-500";
             }
-            renderCharts(expenses, selectedMonthValue);
-            renderBudgetTable(incomes, data.essentials, data.lifestyle, data.others);
+            
+            renderCharts(totalOutflows, selectedMonthValue);
+            renderBudgetTable(incomes, data);
         }
 
-        function renderBudgetTable(totalIncomes, essentials, lifestyle, others) {
+        function renderBudgetTable(totalIncomes, data) {
             const tbody = document.getElementById('budgetTableBody');
             if(!tbody) return;
             const incomeBase = totalIncomes > 0 ? totalIncomes : 0;
-            const totalExpenses = essentials + lifestyle + others;
-            const savings = Math.max(0, incomeBase - totalExpenses);
             
-            // Consolida a categoria 'Outros' no bloco de Estilo de Vida
-            const totalLifestyle = lifestyle + others;
-            
-            const targets = [
-                { name: 'Necessidades Essenciais', pct: 50, current: essentials },
-                { name: 'Estilo de Vida e Variados', pct: 30, current: totalLifestyle },
-                { name: 'Aportes e Poupança', pct: 20, current: savings }
+            const rows = [
+                { name: 'Despesas Essenciais', pct: 50, current: data.essentials, type: 'expense' },
+                { name: 'Estilo de Vida e Variados', pct: 30, current: data.lifestyle, type: 'expense' },
+                { name: '📈 Aporte: Liquidez Diária', pct: null, current: data.aporteLiquidez, type: 'sub_aporte' },
+                { name: '🪙 Aporte: Criptomoedas', pct: null, current: data.aporteCripto, type: 'sub_aporte' },
+                { name: '💼 Aporte: Outros Investimentos', pct: null, current: data.aporteOutros, type: 'sub_aporte' },
+                { name: '🎯 Total de Aportes Realizados', pct: 20, current: data.totalAportes, type: 'total_aporte' }
             ];
             
             tbody.innerHTML = '';
-            targets.forEach(item => {
-                const limitAmount = incomeBase * (item.pct / 100);
-                let consumptionPct = limitAmount > 0 ? Math.round((item.current / limitAmount) * 100) : (item.current > 0 ? 100 : 0);
+            rows.forEach(item => {
+                const limitAmount = item.pct ? incomeBase * (item.pct / 100) : 0;
+                let consumptionPct = 0;
+                
+                if (item.pct) {
+                    consumptionPct = limitAmount > 0 ? Math.round((item.current / limitAmount) * 100) : (item.current > 0 ? 100 : 0);
+                }
                 
                 let statusLabel, statusClass;
-                if (incomeBase === 0 && item.current > 0) { 
-                    statusLabel = 'Sem Receita Base'; 
-                    statusClass = 'bg-slate-500/10 text-slate-500 border-slate-500/20'; 
-                } else if (item.name.includes('Poupança')) {
-                    if (consumptionPct >= 100) { statusLabel = 'Meta Atingida'; statusClass = 'bg-brand-500/10 text-brand-500 border-brand-500/20'; }
+                
+                if (item.type === 'sub_aporte') {
+                    statusLabel = item.current > 0 ? 'Aportado' : 'Sem Aporte';
+                    statusClass = item.current > 0 ? 'bg-brand-500/10 text-brand-500 border-brand-500/20' : 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+                } else if (item.type === 'total_aporte') {
+                    if (incomeBase === 0 && item.current > 0) { statusLabel = 'Sem Receita Base'; statusClass = 'bg-slate-500/10 text-slate-500 border-slate-500/20'; }
+                    else if (consumptionPct >= 100) { statusLabel = 'Meta Atingida'; statusClass = 'bg-brand-500/10 text-brand-500 border-brand-500/20'; }
                     else if (consumptionPct >= 50) { statusLabel = 'Bom Progresso'; statusClass = 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'; }
                     else if (consumptionPct > 0) { statusLabel = 'Abaixo da Meta'; statusClass = 'bg-amber-500/10 text-amber-500 border-amber-500/20'; }
                     else { statusLabel = 'Sem Aportes'; statusClass = 'bg-rose-500/10 text-rose-500 border-rose-500/20'; }
                 } else {
-                    if (consumptionPct > 100) { statusLabel = 'Excedido'; statusClass = 'bg-rose-500/10 text-rose-500 border-rose-500/20'; }
+                    if (incomeBase === 0 && item.current > 0) { statusLabel = 'Sem Receita Base'; statusClass = 'bg-slate-500/10 text-slate-500 border-slate-500/20'; }
+                    else if (consumptionPct > 100) { statusLabel = 'Excedido'; statusClass = 'bg-rose-500/10 text-rose-500 border-rose-500/20'; }
                     else if (consumptionPct >= 85) { statusLabel = 'Atenção Crítica'; statusClass = 'bg-amber-500/10 text-amber-500 border-amber-500/20'; }
-                    else { statusLabel = 'Regular'; statusClass = 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'; }
+                    else { statusLabel = 'Dentro do Limite'; statusClass = 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'; }
                 }
 
+                const isSub = item.type === 'sub_aporte';
+                const isTotal = item.type === 'total_aporte';
+
                 tbody.innerHTML += `
-                    <tr class="hover:bg-slate-100/40 dark:hover:bg-slate-800/20 transition-all duration-150">
-                        <td class="p-4 pl-5 font-medium">${item.name}</td>
-                        <td class="p-4 font-semibold">${formatCurrency(limitAmount)} (${item.pct}%)</td>
-                        <td class="p-4 font-bold">${formatCurrency(item.current)}</td>
-                        <td class="p-4"><div class="flex items-center gap-2 max-w-[130px]"><div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden"><div class="${consumptionPct > 100 && !item.name.includes('Poupança') ? 'bg-rose-500' : consumptionPct >= 85 && !item.name.includes('Poupança') ? 'bg-amber-500' : 'bg-brand-500'} h-full rounded-full transition-all" style="width: ${Math.min(consumptionPct, 100)}%"></div></div><span class="text-xs font-bold text-slate-400">${consumptionPct}%</span></div></td>
+                    <tr class="${isSub ? 'bg-slate-50/50 dark:bg-slate-800/20 text-xs' : 'font-medium'} ${isTotal ? 'bg-emerald-500/5 font-bold border-t border-slate-200 dark:border-slate-700' : ''} hover:bg-slate-100/40 dark:hover:bg-slate-800/40 transition-all duration-150">
+                        <td class="p-4 ${isSub ? 'pl-9 text-slate-600 dark:text-slate-400' : 'pl-5'}">${item.name}</td>
+                        <td class="p-4 ${isSub ? 'text-slate-400' : 'font-semibold'}">${item.pct ? `${formatCurrency(limitAmount)} (${item.pct}%)` : '--'}</td>
+                        <td class="p-4 font-bold ${isSub ? 'text-slate-700 dark:text-slate-300' : ''}">${formatCurrency(item.current)}</td>
+                        <td class="p-4">
+                            ${item.pct ? `
+                            <div class="flex items-center gap-2 max-w-[130px]">
+                                <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
+                                    <div class="${consumptionPct > 100 && !isTotal ? 'bg-rose-500' : consumptionPct >= 85 && !isTotal ? 'bg-amber-500' : 'bg-brand-500'} h-full rounded-full transition-all" style="width: ${Math.min(consumptionPct, 100)}%"></div>
+                                </div>
+                                <span class="text-xs font-bold text-slate-400">${consumptionPct}%</span>
+                            </div>` : '<span class="text-slate-400 text-xs">Individ.</span>'}
+                        </td>
                         <td class="p-4 pr-5 text-right"><span class="px-2.5 py-1 text-xs border rounded-full font-semibold ${statusClass}">${statusLabel}</span></td>
                     </tr>`;
             });
@@ -793,7 +843,7 @@
             const chartContainer = document.getElementById('chartContainer');
             if(!chartContainer) return;
             if (totalExpenses === 0) { 
-                chartContainer.innerHTML = `<p class="text-sm text-slate-400 text-center py-8">Nenhuma despesa para gerar o demonstrativo.</p>`; 
+                chartContainer.innerHTML = `<p class="text-sm text-slate-400 text-center py-8">Nenhuma saída ou aporte para gerar o demonstrativo.</p>`; 
                 return; 
             }
             const categoriesMap = {};
@@ -813,7 +863,18 @@
             sortedCats.forEach(([cat, amt]) => {
                 const pct = totalExpenses > 0 ? Math.round((amt / totalExpenses) * 100) : 0;
                 if (pct === 0) return;
-                chartContainer.innerHTML += `<div class="space-y-1 group"><div class="flex justify-between text-xs font-medium"><span class="text-slate-600 dark:text-slate-300 font-semibold">${sanitizeString(cat)}</span><span class="text-slate-500 dark:text-slate-400">${formatCurrency(amt)} (${pct}%)</span></div><div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2"><div class="bg-brand-500 h-2 rounded-full transition-all" style="width: ${pct}%"></div></div></div>`;
+                const isAporte = cat.startsWith('Aporte');
+                
+                chartContainer.innerHTML += `
+                    <div class="space-y-1 group">
+                        <div class="flex justify-between text-xs font-medium">
+                            <span class="${isAporte ? 'font-bold text-brand-500 dark:text-brand-400' : 'text-slate-600 dark:text-slate-300 font-semibold'}">${sanitizeString(cat)}</span>
+                            <span class="text-slate-500 dark:text-slate-400">${formatCurrency(amt)} (${pct}%)</span>
+                        </div>
+                        <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2">
+                            <div class="${isAporte ? 'bg-emerald-500' : 'bg-brand-500'} h-2 rounded-full transition-all" style="width: ${pct}%"></div>
+                        </div>
+                    </div>`;
             });
         }
 
@@ -834,7 +895,6 @@
                 return;
             }
             
-            // Ordenação lexicográfica de data (YYYY-MM-DD) segura e livre de problemas de timezone
             const sortedTxs = [...txsArray].sort((a, b) => {
                 const da = a.date || '';
                 const db = b.date || '';
@@ -855,14 +915,26 @@
                 const isIncome = type === 'receita';
                 const desc = sanitizeString(tx.description || 'Sem descrição');
                 const cat = sanitizeString(tx.category || 'Outros');
+                const isAporte = cat.startsWith('Aporte');
                 const dateStr = safeDateFormat(tx.date);
                 const amt = parseFloat(tx.amount) || 0;
                 const id = tx.id || '';
                 
+                let iconClass = 'fa-solid fa-arrow-trend-down';
+                let badgeClass = 'bg-rose-500/10 text-rose-500';
+                
+                if (isIncome) {
+                    iconClass = 'fa-solid fa-arrow-trend-up';
+                    badgeClass = 'bg-emerald-500/10 text-emerald-500';
+                } else if (isAporte) {
+                    iconClass = 'fa-solid fa-piggy-bank';
+                    badgeClass = 'bg-brand-500/10 text-brand-500';
+                }
+
                 return `<div class="flex items-center justify-between p-4 hover:bg-slate-100/40 dark:hover:bg-slate-800/20 transition-all duration-150 group">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-semibold transition-transform duration-200 group-hover:scale-105 ${isIncome ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}">
-                            <i class="${isIncome ? 'fa-solid fa-arrow-trend-up' : 'fa-solid fa-arrow-trend-down'}"></i>
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-semibold transition-transform duration-200 group-hover:scale-105 ${badgeClass}">
+                            <i class="${iconClass}"></i>
                         </div>
                         <div>
                             <p class="font-semibold text-sm">${desc}</p>
@@ -870,7 +942,7 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-4">
-                        <span class="font-bold text-sm ${isIncome ? 'text-emerald-500' : ''}">${isIncome ? '+' : '-'} ${formatCurrency(amt)}</span>
+                        <span class="font-bold text-sm ${isIncome ? 'text-emerald-500' : isAporte ? 'text-brand-500' : ''}">${isIncome ? '+' : '-'} ${formatCurrency(amt)}</span>
                         <button onclick="deleteTransaction('${id}')" class="text-slate-400 hover:text-rose-500 transition-all text-xs p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg" title="Excluir">
                             <i class="fa-solid fa-trash"></i>
                         </button>
@@ -889,9 +961,8 @@
 
         function openModal(type) {
             document.getElementById('txType').value = type;
-            document.getElementById('modalTitle').innerText = type === 'receita' ? 'Adicionar Receita Contábil' : 'Adicionar Despesa / Débito';
+            document.getElementById('modalTitle').innerText = type === 'receita' ? 'Adicionar Receita Contábil' : 'Adicionar Despesa / Aporte';
             
-            // Popula opções dinâmicas de acordo com o tipo da transação
             const catSelect = document.getElementById('txCategory');
             catSelect.innerHTML = '';
             (categoriesByType[type] || categoriesByType.despesa).forEach(cat => {
