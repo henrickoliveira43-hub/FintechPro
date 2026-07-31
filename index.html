@@ -43,6 +43,82 @@
         ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
         .tab-content { display: none; }
         .tab-content.active { display: block; animation: fadeInUp 0.4s ease-out forwards; }
+        
+        /* Calendário Anual */
+        .year-calendar { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 6px; 
+        }
+        @media (min-width: 400px) {
+            .year-calendar { grid-template-columns: repeat(4, 1fr); }
+        }
+        .month-cell {
+            position: relative;
+            padding: 10px 4px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1.5px solid transparent;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .month-cell:hover {
+            background: #f1f5f9;
+            transform: translateY(-1px);
+        }
+        .dark .month-cell:hover {
+            background: #334155;
+        }
+        .month-cell.selected {
+            background: #22c55e;
+            color: white;
+            border-color: #16a34a;
+            box-shadow: 0 2px 8px rgba(34,197,94,0.3);
+        }
+        .month-cell.has-data::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #22c55e;
+        }
+        .month-cell.selected.has-data::after {
+            background: rgba(255,255,255,0.8);
+        }
+        .month-cell.current-month {
+            border-color: #22c55e;
+            color: #16a34a;
+            font-weight: 700;
+        }
+        .dark .month-cell.current-month {
+            border-color: #4ade80;
+            color: #4ade80;
+        }
+        .month-cell.selected.current-month {
+            color: white;
+        }
+        .year-nav-btn {
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #64748b;
+        }
+        .year-nav-btn:hover {
+            background: #f1f5f9;
+            color: #334155;
+        }
+        .dark .year-nav-btn:hover {
+            background: #334155;
+            color: #e2e8f0;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-darkBg dark:text-slate-100 min-h-screen flex flex-col md:flex-row antialiased">
@@ -76,8 +152,8 @@
         </div>
 
         <div class="mt-6 md:mt-0 pt-4 border-t border-slate-200 dark:border-slate-700 flex items-center justify-center text-xs text-slate-400 gap-2">
-            <i class="fa-solid fa-cloud text-brand-500 text-sm animate-pulseSlow"></i>
-            <span class="font-medium tracking-wide">Sincronizado com Nuvem</span>
+            <i class="fa-solid fa-cloud text-brand-500 text-sm animate-pulseSlow" id="syncIcon"></i>
+            <span class="font-medium tracking-wide" id="syncStatus">Sincronizado com Nuvem</span>
         </div>
     </aside>
 
@@ -89,8 +165,36 @@
                 <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Gerenciamento seguro e em tempo real via Firebase.</p>
             </div>
             <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
-                <select id="monthSelector" onchange="updateMetrics(); renderTransactions();" class="w-full sm:w-auto px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white shadow-sm cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 transition-all">
-                </select>
+                <div class="relative w-full sm:w-auto">
+                    <button id="monthSelectorBtn" onclick="toggleMonthDropdown(event)" class="w-full sm:w-auto px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white shadow-sm cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 transition-all flex items-center gap-2">
+                        <i class="fa-regular fa-calendar text-slate-400"></i>
+                        <span id="monthSelectorLabel">Carregando...</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-400 ml-1 transition-transform" id="monthChevron"></i>
+                    </button>
+                    
+                    <!-- DROPDOWN DO CALENDÁRIO ANUAL -->
+                    <div id="monthDropdown" class="absolute right-0 mt-2 w-[280px] sm:w-[320px] bg-white dark:bg-darkCard border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl z-50 hidden p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <button type="button" onclick="changeCalendarYear(-1)" class="year-nav-btn" title="Ano anterior">
+                                <i class="fa-solid fa-chevron-left text-sm"></i>
+                            </button>
+                            <span id="calendarYearLabel" class="text-lg font-bold text-slate-800 dark:text-white select-none"></span>
+                            <button type="button" onclick="changeCalendarYear(1)" class="year-nav-btn" title="Próximo ano">
+                                <i class="fa-solid fa-chevron-right text-sm"></i>
+                            </button>
+                        </div>
+                        <div id="yearCalendarGrid" class="year-calendar mb-3"></div>
+                        <div class="pt-3 border-t border-slate-100 dark:border-slate-700/50">
+                            <button type="button" onclick="selectMonth('all')" class="w-full py-2 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-brand-500 dark:hover:text-brand-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg transition-all flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-layer-group text-xs"></i> Todos os Meses
+                            </button>
+                        </div>
+                        <div class="mt-2 flex items-center justify-center gap-4 text-[10px] text-slate-400">
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-brand-500"></span> Com dados</span>
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full border border-brand-500"></span> Atual</span>
+                        </div>
+                    </div>
+                </div>
                 <button onclick="openModal('receita')" class="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl shadow-md shadow-emerald-600/10 hover:shadow-emerald-600/20 active:scale-95 transition-all text-sm">
                     <i class="fa-solid fa-plus-circle"></i> Receita
                 </button>
@@ -130,7 +234,7 @@
                 <div class="lg:col-span-2 bg-white dark:bg-darkCard p-6 rounded-2xl border border-slate-200/60 dark:border-slate-700/40 shadow-sm">
                     <div class="flex justify-between items-center mb-5">
                         <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100">Distribuição por Categorias</h3>
-                        <span class="text-xs font-semibold bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full text-slate-500 dark:text-slate-400">Mensal</span>
+                        <span class="text-xs font-semibold bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full text-slate-500 dark:text-slate-400" id="chartPeriodLabel">Mensal</span>
                     </div>
                     <div id="chartContainer" class="space-y-4 pt-1">
                         <p class="text-sm text-slate-400 text-center py-8">Nenhuma transação registrada para gerar gráficos.</p>
@@ -159,7 +263,9 @@
                     <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100">Últimos Lançamentos do Mês</h3>
                     <button onclick="switchTab(null, 'transactions')" class="text-sm text-brand-500 hover:text-brand-600 font-semibold hover:underline transition-all">Ver Histórico Completo</button>
                 </div>
-                <div class="divide-y divide-slate-100 dark:divide-slate-800/60" id="recentTransactionsList"></div>
+                <div class="divide-y divide-slate-100 dark:divide-slate-800/60" id="recentTransactionsList">
+                    <div class="p-6 text-center text-sm text-slate-400">Carregando dados...</div>
+                </div>
             </div>
         </section>
 
@@ -170,16 +276,24 @@
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                     <input type="text" id="searchInput" oninput="renderTransactions()" placeholder="Filtrar por descrição ou categoria..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white hover:border-slate-300 dark:hover:border-slate-600 transition-all">
                 </div>
-                <div class="flex gap-2">
+                <div class="flex gap-2 flex-wrap">
                     <select id="filterType" onchange="renderTransactions()" class="px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer text-slate-900 dark:text-white hover:border-slate-300 dark:hover:border-slate-600 transition-all">
                         <option value="all">Todos os fluxos</option>
                         <option value="receita">Apenas Receitas (+)</option>
                         <option value="despesa">Apenas Despesas (-)</option>
                     </select>
+                    <div class="relative">
+                        <input type="month" id="periodFilter" onchange="handlePeriodFilterChange()" class="px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500 cursor-pointer text-slate-900 dark:text-white hover:border-slate-300 dark:hover:border-slate-600 transition-all">
+                        <button onclick="clearPeriodFilter()" id="clearPeriodBtn" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-500 hidden" title="Limpar filtro de período">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
             <div class="bg-white dark:bg-darkCard rounded-2xl border border-slate-200/60 dark:border-slate-700/40 shadow-sm overflow-hidden">
-                <div class="divide-y divide-slate-100 dark:divide-slate-800/60" id="fullTransactionsList"></div>
+                <div class="divide-y divide-slate-100 dark:divide-slate-800/60" id="fullTransactionsList">
+                    <div class="p-6 text-center text-sm text-slate-400">Carregando dados...</div>
+                </div>
             </div>
         </section>
 
@@ -196,12 +310,14 @@
                             <tr class="bg-slate-50 dark:bg-slate-800/40 border-b border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-400 uppercase tracking-wider">
                                 <th class="p-4 pl-5">Diretriz de Alocação</th>
                                 <th class="p-4">Teto Recomendado</th>
-                                <th class="p-4">Gasto Consumido</th>
+                                <th class="p-4">Valor Consumido</th>
                                 <th class="p-4">Alocação Atual</th>
                                 <th class="p-4 pr-5 text-right">Status de Risco</th>
                             </tr>
                         </thead>
-                        <tbody id="budgetTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50 text-sm"></tbody>
+                        <tbody id="budgetTableBody" class="divide-y divide-slate-100 dark:divide-slate-800/50 text-sm">
+                            <tr><td colspan="5" class="p-6 text-center text-slate-400">Carregando dados...</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -237,279 +353,4 @@
                             <option value="Lazer">Lazer</option>
                             <option value="Dinheiro">Dinheiro</option>
                             <option value="Salário">Salário / Proventos</option>
-                            <option value="Outros">Outras Despesas</option>
-                        </select>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Data</label>
-                    <input type="date" id="txDate" required class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white transition-all">
-                </div>
-                <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex gap-3">
-                    <button type="button" onclick="closeModal()" class="flex-1 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm font-semibold rounded-xl transition-colors text-slate-700 dark:text-slate-300">Cancelar</button>
-                    <button type="submit" class="flex-1 py-2.5 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold rounded-xl shadow-md shadow-brand-500/10 transition-colors active:scale-95">Confirmar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- FIREBASE MODULE -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAaW1Uean9dGmKT7xngvft5hsiEgY73iZQ",
-            authDomain: "fintech-pro-ed6bd.firebaseapp.com",
-            projectId: "fintech-pro-ed6bd",
-            storageBucket: "fintech-pro-ed6bd.firebasestorage.app",
-            messagingSenderId: "519059837621",
-            appId: "1:519059837621:web:9856b174b269b0d092e4fc"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const txCollectionRef = collection(db, "transactions");
-
-        window.state = { transactions: [] };
-
-        const q = query(txCollectionRef, orderBy("date", "desc"));
-        onSnapshot(q, (snapshot) => {
-            window.state.transactions = [];
-            snapshot.forEach((doc) => {
-                window.state.transactions.push({ id: doc.id, ...doc.data() });
-            });
-            updateMonthSelectorOptions();
-            updateMetrics();
-            renderTransactions();
-        });
-
-        window.handleFormSubmit = async function(e) {
-            e.preventDefault();
-            const desc = document.getElementById('txDescription').value.trim();
-            const amt = parseFloat(document.getElementById('txAmount').value);
-            const cat = document.getElementById('txCategory').value;
-            const date = document.getElementById('txDate').value;
-            const type = document.getElementById('txType').value;
-            if(!desc || isNaN(amt) || amt <= 0) return;
-
-            try {
-                await addDoc(txCollectionRef, { description: desc, amount: amt, type: type, category: cat, date: date });
-                closeModal();
-                document.getElementById('transactionForm').reset();
-            } catch (err) {
-                alert("Erro ao salvar dados.");
-            }
-        };
-
-        window.deleteTransaction = async function(id) {
-            if(confirm("Deseja realmente excluir este registro?")) {
-                await deleteDoc(doc(db, "transactions", id));
-            }
-        };
-    </script>
-
-    <!-- CORE JAVASCRIPT -->
-    <script>
-        function switchTab(e, tabId) {
-            if(e) e.preventDefault();
-            document.querySelectorAll('.tab-content').forEach(section => section.classList.remove('active'));
-            const activeSection = document.getElementById(`tab-${tabId}`);
-            if(activeSection) activeSection.classList.add('active');
-            
-            document.querySelectorAll('.nav-link').forEach(a => {
-                a.classList.remove('bg-brand-500/10', 'text-brand-500', 'font-semibold', 'shadow-sm');
-                a.classList.add('text-slate-600', 'dark:text-slate-400', 'font-medium');
-            });
-            
-            const targetedAnchor = e ? e.currentTarget : document.querySelector(`[onclick*="'${tabId}'"]`);
-            if(targetedAnchor) {
-                targetedAnchor.classList.remove('text-slate-600', 'dark:text-slate-400', 'font-medium');
-                targetedAnchor.classList.add('bg-brand-500/10', 'text-brand-500', 'font-semibold', 'shadow-sm');
-            }
-            const titles = { dashboard: 'Painel Financeiro', transactions: 'Histórico de Transações', budgets: 'Orçamentos & Diretrizes' };
-            document.getElementById('pageTitle').innerText = titles[tabId] || 'Painel Financeiro';
-        }
-
-        function sanitizeString(str) { return str ? str.replace(/[&<>"']/g, match => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;' })[match]) : ''; }
-        function formatCurrency(value) { return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
-        
-        function getMonthData() {
-            let incomes = 0; let essentials = 0; let lifestyle = 0; let others = 0;
-            const monthSelector = document.getElementById('monthSelector');
-            const selectedMonth = monthSelector ? monthSelector.value : new Date().toISOString().substring(0, 7);
-            
-            if(window.state && window.state.transactions) {
-                window.state.transactions.forEach(tx => {
-                    if (selectedMonth !== 'all' && tx.date.substring(0, 7) !== selectedMonth) return;
-                    if (tx.type === 'receita') incomes += tx.amount;
-                    else {
-                        if (['Alimentação', 'Moradia', 'Transporte', 'Farmácia'].includes(tx.category)) essentials += tx.amount;
-                        else if (['Lazer', 'Dinheiro'].includes(tx.category)) lifestyle += tx.amount;
-                        else others += tx.amount;
-                    }
-                });
-            }
-            return { incomes, expenses: essentials + lifestyle + others, essentials, lifestyle, others };
-        }
-
-        function updateMonthSelectorOptions() {
-            const selector = document.getElementById('monthSelector');
-            if (!selector) return;
-            const previousSelection = selector.value;
-            const months = new Set();
-            const today = new Date();
-            const currentYearMonth = today.toISOString().substring(0, 7);
-            months.add(currentYearMonth);
-            if(window.state && window.state.transactions) {
-                window.state.transactions.forEach(tx => { if (tx.date && tx.date.length >= 7) months.add(tx.date.substring(0, 7)); });
-            }
-            const sortedMonths = Array.from(months).sort((a, b) => b.localeCompare(a));
-            let htmlOptions = '<option value="all">Todos os Meses</option>';
-            sortedMonths.forEach(m => {
-                const [year, month] = m.split('-');
-                const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-                htmlOptions += `<option value="${m}">${monthNames[parseInt(month, 10) - 1]} / ${year}</option>`;
-            });
-            selector.innerHTML = htmlOptions;
-            selector.value = (previousSelection && months.has(previousSelection)) ? previousSelection : currentYearMonth;
-        }
-
-        function updateMetrics() {
-            const data = getMonthData();
-            const incomes = data.incomes; const expenses = data.expenses;
-            document.getElementById('totalBalance').innerText = formatCurrency(incomes - expenses);
-            document.getElementById('totalIncomes').innerText = formatCurrency(incomes);
-            document.getElementById('totalExpenses').innerText = formatCurrency(expenses);
-
-            const metaPercentElem = document.getElementById('metaPercent');
-            const metaBarElem = document.getElementById('metaProgressBar');
-
-            if (incomes > 0) {
-                const savedPercent = Math.min(Math.round(((incomes - expenses) / incomes) * 100), 100);
-                const positiveSaved = savedPercent > 0 ? savedPercent : 0;
-                metaPercentElem.innerText = `${positiveSaved}%`;
-                metaBarElem.style.width = `${positiveSaved}%`;
-                if (positiveSaved >= 20) {
-                    metaPercentElem.className = "font-bold text-brand-500 transition-colors duration-300";
-                    metaBarElem.className = "bg-brand-500 h-full rounded-full transition-all duration-500 shadow-sm shadow-brand-500/20";
-                } else if (positiveSaved > 0) {
-                    metaPercentElem.className = "font-bold text-amber-500 transition-colors duration-300";
-                    metaBarElem.className = "bg-amber-500 h-full rounded-full transition-all duration-500 shadow-sm shadow-amber-500/20";
-                } else {
-                    metaPercentElem.className = "font-bold text-rose-500 transition-colors duration-300";
-                    metaBarElem.className = "bg-rose-500 h-full rounded-full transition-all duration-500 shadow-sm shadow-rose-500/20";
-                }
-            } else {
-                metaPercentElem.innerText = `0%`;
-                metaPercentElem.className = "font-bold text-slate-400";
-                metaBarElem.style.width = `0%`;
-                metaBarElem.className = "bg-slate-300 dark:bg-slate-700 h-full rounded-full transition-all duration-500";
-            }
-            renderCharts(expenses, document.getElementById('monthSelector').value);
-            renderBudgetTable(incomes, data.essentials, data.lifestyle, data.others);
-        }
-
-        function renderBudgetTable(totalIncomes, essentials, lifestyle, others) {
-            const tbody = document.getElementById('budgetTableBody');
-            if(!tbody) return;
-            const incomeBase = totalIncomes > 0 ? totalIncomes : 0;
-            const targets = [
-                { name: 'Necessidades Essenciais', pct: 50, current: essentials },
-                { name: 'Estilo de Vida e Variados', pct: 30, current: lifestyle },
-                { name: 'Aportes e Outros', pct: 20, current: others }
-            ];
-            tbody.innerHTML = '';
-            targets.forEach(item => {
-                const limitAmount = incomeBase * (item.pct / 100);
-                const consumptionPct = limitAmount > 0 ? Math.round((item.current / limitAmount) * 100) : (item.current > 0 ? 100 : 0);
-                let statusLabel = consumptionPct > 100 ? 'Excedido' : consumptionPct >= 85 ? 'Atenção Crítica' : 'Regular';
-                let statusClass = consumptionPct > 100 ? 'bg-rose-500/10 text-rose-500 border-rose-500/20' : consumptionPct >= 85 ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
-                if (incomeBase === 0 && item.current > 0) { statusLabel = 'Sem Receita Base'; statusClass = 'bg-slate-500/10 text-slate-500 border-slate-500/20'; }
-
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-100/40 dark:hover:bg-slate-800/20 transition-all duration-150">
-                        <td class="p-4 pl-5 font-medium">${item.name}</td>
-                        <td class="p-4 font-semibold">${formatCurrency(limitAmount)} (${item.pct}%)</td>
-                        <td class="p-4 font-bold">${formatCurrency(item.current)}</td>
-                        <td class="p-4"><div class="flex items-center gap-2 max-w-[130px]"><div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden"><div class="${consumptionPct > 100 ? 'bg-rose-500' : consumptionPct >= 85 ? 'bg-amber-500' : 'bg-brand-500'} h-full rounded-full transition-all" style="width: ${Math.min(consumptionPct, 100)}%"></div></div><span class="text-xs font-bold text-slate-400">${consumptionPct}%</span></div></td>
-                        <td class="p-4 pr-5 text-right"><span class="px-2.5 py-1 text-xs border rounded-full font-semibold ${statusClass}">${statusLabel}</span></td>
-                    </tr>`;
-            });
-        }
-
-        function renderCharts(totalExpenses, selectedMonth) {
-            const chartContainer = document.getElementById('chartContainer');
-            if(!chartContainer) return;
-            if (totalExpenses === 0) { chartContainer.innerHTML = `<p class="text-sm text-slate-400 text-center py-8">Nenhuma despesa para gerar o demonstrativo.</p>`; return; }
-            const categoriesMap = {};
-            if(window.state && window.state.transactions) {
-                window.state.transactions.filter(t => t.type === 'despesa').forEach(tx => {
-                    if (selectedMonth !== 'all' && tx.date.substring(0, 7) !== selectedMonth) return;
-                    categoriesMap[tx.category] = (categoriesMap[tx.category] || 0) + tx.amount;
-                });
-            }
-            chartContainer.innerHTML = '';
-            for (let cat in categoriesMap) {
-                const amt = categoriesMap[cat]; const pct = Math.round((amt / totalExpenses) * 100);
-                if (pct === 0) continue;
-                chartContainer.innerHTML += `<div class="space-y-1 group"><div class="flex justify-between text-xs font-medium"><span class="text-slate-600 dark:text-slate-300 font-semibold">${cat}</span><span class="text-slate-500 dark:text-slate-400">${formatCurrency(amt)} (${pct}%)</span></div><div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2"><div class="bg-brand-500 h-2 rounded-full transition-all" style="width: ${pct}%"></div></div></div>`;
-            }
-        }
-
-        function renderTransactions() {
-            const recentList = document.getElementById('recentTransactionsList');
-            const fullList = document.getElementById('fullTransactionsList');
-            if(!recentList || !fullList) return;
-
-            const searchVal = document.getElementById('searchInput') ? document.getElementById('searchInput').value.toLowerCase() : "";
-            const filterType = document.getElementById('filterType') ? document.getElementById('filterType').value : "all";
-            const selectedMonth = document.getElementById('monthSelector') ? document.getElementById('monthSelector').value : "all";
-
-            const txsArray = (window.state && window.state.transactions) ? window.state.transactions : [];
-            const sortedTxs = [...txsArray].sort((a,b) => new Date(b.date) - new Date(a.date));
-
-            const filteredTxs = sortedTxs.filter(tx => {
-                return (tx.description.toLowerCase().includes(searchVal) || tx.category.toLowerCase().includes(searchVal)) &&
-                       (filterType === 'all' || tx.type === filterType) &&
-                       (selectedMonth === 'all' || tx.date.substring(0, 7) === selectedMonth);
-            });
-
-            const renderItem = (tx) => `<div class="flex items-center justify-between p-4 hover:bg-slate-100/40 dark:hover:bg-slate-800/20 transition-all duration-150 group"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-semibold transition-transform duration-200 group-hover:scale-105 ${tx.type === 'receita' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}"><i class="${tx.type === 'receita' ? 'fa-solid fa-arrow-trend-up' : 'fa-solid fa-arrow-trend-down'}"></i></div><div><p class="font-semibold text-sm">${sanitizeString(tx.description)}</p><span class="text-xs text-slate-400 font-medium">${tx.category} • ${tx.date.split('-').reverse().join('/')}</span></div></div><div class="flex items-center gap-4"><span class="font-bold text-sm ${tx.type === 'receita' ? 'text-emerald-500' : ''}">${tx.type === 'receita' ? '+' : '-'} ${formatCurrency(tx.amount)}</span><button onclick="deleteTransaction('${tx.id}')" class="text-slate-400 hover:text-rose-500 transition-all text-xs p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"><i class="fa-solid fa-trash"></i></button></div></div>`;
-
-            recentList.innerHTML = sortedTxs.filter(tx => selectedMonth === 'all' || tx.date.substring(0, 7) === selectedMonth).slice(0, 4).map(renderItem).join('') || `<p class="text-center p-6 text-sm text-slate-400">Nenhum registro para este mês.</p>`;
-            fullList.innerHTML = filteredTxs.map(renderItem).join('') || `<p class="text-center p-6 text-sm text-slate-400">Nenhum registro correspondente.</p>`;
-        }
-
-        function openModal(type) {
-            document.getElementById('txType').value = type;
-            document.getElementById('modalTitle').innerText = type === 'receita' ? 'Adicionar Receita Contábil' : 'Adicionar Despesa / Débito';
-            const modal = document.getElementById('transactionModal');
-            modal.classList.remove('hidden');
-            setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('modalContent').classList.remove('scale-95'); }, 10);
-            document.getElementById('txDate').value = new Date().toISOString().split('T')[0];
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('transactionModal');
-            modal.classList.add('opacity-0'); document.getElementById('modalContent').classList.add('scale-95');
-            setTimeout(() => modal.classList.add('hidden'), 300);
-        }
-
-        document.getElementById('transactionModal').addEventListener('click', function(e) { if(e.target === this) closeModal(); });
-
-        document.getElementById('themeToggle').addEventListener('click', () => {
-            if (document.documentElement.classList.contains('dark')) {
-                document.documentElement.classList.remove('dark'); localStorage.setItem('theme', 'light');
-            } else {
-                document.documentElement.classList.add('dark'); localStorage.setItem('theme', 'dark');
-            }
-        });
-
-        document.addEventListener("DOMContentLoaded", () => {
-            if (localStorage.getItem('theme') === 'light') document.documentElement.classList.remove('dark');
-            updateMonthSelectorOptions(); updateMetrics(); renderTransactions();
-        });
-    </script>
-</body>
-</html>
+                            <option value="Outros">Outras Despesas
