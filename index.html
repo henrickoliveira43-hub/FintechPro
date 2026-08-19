@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fintech Pro - Gestão Financeira Completa</title>
+    <title>Fintech Pro v2.0 - Gestão Financeira Completa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -106,7 +106,10 @@
                     <div class="p-2.5 bg-brand-500 rounded-xl text-white shadow-lg shadow-brand-500/20 group-hover:scale-110 transition-transform duration-300">
                         <i class="fa-solid fa-wallet text-lg"></i>
                     </div>
-                    <span class="text-xl font-bold bg-gradient-to-r from-brand-500 to-emerald-400 bg-clip-text text-transparent tracking-tight">FintechPro</span>
+                    <div>
+                        <span class="text-xl font-bold bg-gradient-to-r from-brand-500 to-emerald-400 bg-clip-text text-transparent tracking-tight block">FintechPro</span>
+                        <span class="text-[10px] font-semibold text-slate-400 tracking-wider uppercase">Henrique Studio</span>
+                    </div>
                 </div>
                 <button id="themeToggle" type="button" aria-label="Alternar tema" class="p-2.5 text-slate-500 hover:text-brand-500 dark:text-slate-400 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 active:scale-90">
                     <i class="fa-solid fa-moon text-lg dark:hidden"></i>
@@ -133,7 +136,7 @@
             </button>
             <div class="flex items-center justify-center text-xs text-slate-400 gap-2">
                 <i class="fa-solid fa-cloud text-brand-500 text-sm animate-pulseSlow" id="syncIcon"></i>
-                <span class="font-medium tracking-wide" id="syncStatus">Sincronizado com Nuvem</span>
+                <span class="font-medium tracking-wide" id="syncStatus">Sincronizado v2.0</span>
             </div>
         </div>
     </aside>
@@ -144,7 +147,7 @@
         <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200/40 dark:border-slate-700/30 pb-5">
             <div>
                 <h1 id="pageTitle" class="text-2xl md:text-3xl font-bold tracking-tight">Painel Financeiro</h1>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Gerenciamento completo e em tempo real via Firebase.</p>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Gestão automatizada e segura com Firebase Firestore.</p>
             </div>
             <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
                 <div class="relative w-full sm:w-auto">
@@ -488,7 +491,7 @@
             }
             const titles = { dashboard: 'Painel Financeiro', transactions: 'Histórico de Transações', budgets: 'Orçamentos & Aportes' };
             document.getElementById('pageTitle').innerText = titles[tabId] || 'Painel Financeiro';
-            document.title = `${titles[tabId] || 'Painel'} | Fintech Pro`;
+            document.title = `${titles[tabId] || 'Painel'} | Fintech Pro v2.0`;
         }
 
         function sanitizeString(str) { 
@@ -574,7 +577,7 @@
             if (!icon || !status) return;
             if (connected) {
                 icon.className = "fa-solid fa-cloud text-brand-500 text-sm animate-pulseSlow";
-                status.innerText = "Sincronizado com Nuvem";
+                status.innerText = "Sincronizado v2.0";
                 status.className = "font-medium tracking-wide text-slate-400";
             } else {
                 icon.className = "fa-solid fa-triangle-exclamation text-amber-500 text-sm";
@@ -1007,7 +1010,7 @@
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `FintechPro_Export_${getLocalDateString()}.csv`);
+            link.setAttribute("download", `FintechPro_v2_Export_${getLocalDateString()}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
