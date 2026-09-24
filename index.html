@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fintech Pro v2.0 - Gestão Financeira Completa</title>
+    <title>Fintech Pro v2.1 - Gestão Financeira Completa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -136,7 +136,7 @@
             </button>
             <div class="flex items-center justify-center text-xs text-slate-400 gap-2">
                 <i class="fa-solid fa-cloud text-brand-500 text-sm animate-pulseSlow" id="syncIcon"></i>
-                <span class="font-medium tracking-wide" id="syncStatus">Sincronizado v2.0</span>
+                <span class="font-medium tracking-wide" id="syncStatus">Sincronizado v2.1</span>
             </div>
         </div>
     </aside>
@@ -144,7 +144,7 @@
     <!-- CONTEÚDO PRINCIPAL -->
     <main class="flex-1 p-4 md:p-8 space-y-6 overflow-y-auto max-w-7xl mx-auto w-full">
         
-        <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200/40 dark:border-slate-700/30 pb-5">
+        <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200/40 dark:border-slate-700/30 pb-5 relative z-30">
             <div>
                 <h1 id="pageTitle" class="text-2xl md:text-3xl font-bold tracking-tight">Painel Financeiro</h1>
                 <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Gestão automatizada e segura com Firebase Firestore.</p>
@@ -263,17 +263,17 @@
             <div class="bg-white dark:bg-darkCard p-4 rounded-2xl border border-slate-200/60 dark:border-slate-700/40 shadow-sm flex flex-col sm:flex-row gap-3">
                 <div class="relative flex-1">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                    <input type="text" id="searchInput" oninput="renderTransactions()" placeholder="Filtrar por descrição ou categoria..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white transition-all">
+                    <input type="text" id="searchInput" oninput="window.renderTransactions()" placeholder="Filtrar por descrição ou categoria..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white transition-all">
                 </div>
                 <div class="flex gap-2 flex-wrap">
-                    <select id="filterType" onchange="renderTransactions()" class="px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white transition-all">
+                    <select id="filterType" onchange="window.renderTransactions()" class="px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white transition-all">
                         <option value="all">Todos os fluxos</option>
                         <option value="receita">Apenas Receitas (+)</option>
                         <option value="despesa">Apenas Saídas/Aportes (-)</option>
                     </select>
                     <div class="relative">
-                        <input type="month" id="periodFilter" onchange="handlePeriodFilterChange()" class="px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white transition-all">
-                        <button onclick="clearPeriodFilter()" id="clearPeriodBtn" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-500 hidden" title="Limpar período">
+                        <input type="month" id="periodFilter" onchange="window.handlePeriodFilterChange()" class="px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white transition-all">
+                        <button onclick="window.clearPeriodFilter()" id="clearPeriodBtn" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-500 hidden" title="Limpar período">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
@@ -319,9 +319,9 @@
         <div class="bg-white dark:bg-darkCard w-full max-w-md rounded-2xl border border-slate-200 dark:border-slate-700 shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300" id="modalContent">
             <div class="p-6 border-b border-slate-100 dark:border-slate-800/80 flex justify-between items-center">
                 <h3 id="modalTitle" class="font-bold text-lg text-slate-900 dark:text-white">Nova Transação</h3>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="window.closeModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <form id="transactionForm" onsubmit="handleFormSubmit(event)" class="p-6 space-y-4">
+            <form id="transactionForm" onsubmit="window.handleFormSubmit(event)" class="p-6 space-y-4">
                 <input type="hidden" id="txId" value="">
                 <input type="hidden" id="txType" value="receita">
                 <div>
@@ -344,7 +344,7 @@
                     <input type="date" id="txDate" required class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white transition-all">
                 </div>
                 <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex gap-3">
-                    <button type="button" onclick="closeModal()" class="flex-1 py-2.5 bg-slate-100 dark:bg-slate-800 text-sm font-semibold rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Cancelar</button>
+                    <button type="button" onclick="window.closeModal()" class="flex-1 py-2.5 bg-slate-100 dark:bg-slate-800 text-sm font-semibold rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Cancelar</button>
                     <button type="submit" class="flex-1 py-2.5 bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold rounded-xl shadow-md transition-colors">Salvar Registro</button>
                 </div>
             </form>
@@ -376,14 +376,14 @@
                 window.state.transactions.push({ id: docSnap.id, ...docSnap.data() });
             });
             window.state.loading = false;
-            if (typeof updateSyncStatus === 'function') updateSyncStatus(true);
-            if (typeof updateMonthSelectorOptions === 'function') updateMonthSelectorOptions();
-            if (typeof updateMetrics === 'function') updateMetrics();
-            if (typeof renderTransactions === 'function') renderTransactions();
+            if (typeof window.updateSyncStatus === 'function') window.updateSyncStatus(true);
+            if (typeof window.updateMonthSelectorOptions === 'function') window.updateMonthSelectorOptions();
+            if (typeof window.updateMetrics === 'function') window.updateMetrics();
+            if (typeof window.renderTransactions === 'function') window.renderTransactions();
         }, (error) => {
             console.error("Erro Firebase:", error);
             window.state.loading = false;
-            if (typeof updateSyncStatus === 'function') updateSyncStatus(false);
+            if (typeof window.updateSyncStatus === 'function') window.updateSyncStatus(false);
         });
 
         window.handleFormSubmit = async function(e) {
@@ -406,7 +406,7 @@
                 } else {
                     await addDoc(txCollectionRef, { description: desc, amount: amt, type: type, category: cat, date: date });
                 }
-                closeModal();
+                window.closeModal();
                 document.getElementById('transactionForm').reset();
             } catch (err) {
                 console.error(err);
@@ -473,7 +473,7 @@
             ]
         };
 
-        function switchTab(e, tabId) {
+        window.switchTab = function(e, tabId) {
             if(e) e.preventDefault();
             document.querySelectorAll('.tab-content').forEach(section => section.classList.remove('active'));
             const activeSection = document.getElementById(`tab-${tabId}`);
@@ -491,8 +491,8 @@
             }
             const titles = { dashboard: 'Painel Financeiro', transactions: 'Histórico de Transações', budgets: 'Orçamentos & Aportes' };
             document.getElementById('pageTitle').innerText = titles[tabId] || 'Painel Financeiro';
-            document.title = `${titles[tabId] || 'Painel'} | Fintech Pro v2.0`;
-        }
+            document.title = `${titles[tabId] || 'Painel'} | Fintech Pro v2.1`;
+        };
 
         function sanitizeString(str) { 
             return str ? String(str).replace(/[&<>"']/g, match => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;' })[match]) : ''; 
@@ -571,20 +571,20 @@
             };
         }
 
-        function updateSyncStatus(connected) {
+        window.updateSyncStatus = function(connected) {
             const icon = document.getElementById('syncIcon');
             const status = document.getElementById('syncStatus');
             if (!icon || !status) return;
             if (connected) {
                 icon.className = "fa-solid fa-cloud text-brand-500 text-sm animate-pulseSlow";
-                status.innerText = "Sincronizado v2.0";
+                status.innerText = "Sincronizado v2.1";
                 status.className = "font-medium tracking-wide text-slate-400";
             } else {
                 icon.className = "fa-solid fa-triangle-exclamation text-amber-500 text-sm";
                 status.innerText = "Erro de sincronização";
                 status.className = "font-medium tracking-wide text-amber-500";
             }
-        }
+        };
 
         // ============ CALENDÁRIO ANUAL ============
         function getMonthsWithData() {
@@ -619,17 +619,17 @@
                 if (isCurrent) classes += ' current-month';
                 if (hasData) classes += ' has-data';
                 
-                html += `<div class="${classes}" onclick="selectMonth('${monthKey}')" title="${monthNamesFull[m]} de ${calendarYear}">${monthNames[m]}</div>`;
+                html += `<div class="${classes}" onclick="window.selectMonth('${monthKey}')" title="${monthNamesFull[m]} de ${calendarYear}">${monthNames[m]}</div>`;
             }
             grid.innerHTML = html;
         }
 
-        function changeCalendarYear(delta) {
+        window.changeCalendarYear = function(delta) {
             calendarYear += delta;
             renderYearCalendar();
-        }
+        };
 
-        function toggleMonthDropdown(e) {
+        window.toggleMonthDropdown = function(e) {
             if (e) e.stopPropagation();
             const dropdown = document.getElementById('monthDropdown');
             const chevron = document.getElementById('monthChevron');
@@ -651,7 +651,7 @@
                 dropdown.classList.add('hidden');
                 if (chevron) chevron.style.transform = 'rotate(0deg)';
             }
-        }
+        };
 
         function closeMonthDropdown() {
             const dropdown = document.getElementById('monthDropdown');
@@ -661,7 +661,7 @@
             monthDropdownOpen = false;
         }
 
-        function selectMonth(value) {
+        window.selectMonth = function(value) {
             selectedMonthValue = value;
             updateMonthSelectorLabel();
             closeMonthDropdown();
@@ -678,9 +678,9 @@
                 }
             }
             
-            updateMetrics();
-            renderTransactions();
-        }
+            window.updateMetrics();
+            window.renderTransactions();
+        };
 
         function updateMonthSelectorLabel() {
             const label = document.getElementById('monthSelectorLabel');
@@ -693,11 +693,11 @@
             label.innerText = `${monthNames[parseInt(month, 10) - 1]} / ${year}`;
         }
 
-        function updateMonthSelectorOptions() {
+        window.updateMonthSelectorOptions = function() {
             updateMonthSelectorLabel();
-        }
+        };
 
-        function handlePeriodFilterChange() {
+        window.handlePeriodFilterChange = function() {
             const val = document.getElementById('periodFilter').value;
             const clearBtn = document.getElementById('clearPeriodBtn');
             if (val) {
@@ -708,23 +708,23 @@
                 if (clearBtn) clearBtn.classList.add('hidden');
             }
             updateMonthSelectorLabel();
-            updateMetrics();
-            renderTransactions();
-        }
+            window.updateMetrics();
+            window.renderTransactions();
+        };
 
-        function clearPeriodFilter() {
+        window.clearPeriodFilter = function() {
             const periodFilter = document.getElementById('periodFilter');
             const clearBtn = document.getElementById('clearPeriodBtn');
             if (periodFilter) periodFilter.value = '';
             if (clearBtn) clearBtn.classList.add('hidden');
             selectedMonthValue = 'all';
             updateMonthSelectorLabel();
-            updateMetrics();
-            renderTransactions();
-        }
+            window.updateMetrics();
+            window.renderTransactions();
+        };
 
         // ============ MÉTRICAS ============
-        function updateMetrics() {
+        window.updateMetrics = function() {
             const data = getMonthData();
             const incomes = data.incomes; 
             const totalOutflows = data.expenses;
@@ -766,7 +766,7 @@
             
             renderCharts(totalOutflows, selectedMonthValue);
             renderBudgetTable(incomes, data);
-        }
+        };
 
         function renderBudgetTable(totalIncomes, data) {
             const tbody = document.getElementById('budgetTableBody');
@@ -871,7 +871,7 @@
             });
         }
 
-        function renderTransactions() {
+        window.renderTransactions = function() {
             const recentList = document.getElementById('recentTransactionsList');
             const fullList = document.getElementById('fullTransactionsList');
             if(!recentList || !fullList) return;
@@ -932,10 +932,10 @@
                     </div>
                     <div class="flex items-center gap-3">
                         <span class="font-bold text-sm ${isIncome ? 'text-emerald-500' : isAporte ? 'text-brand-500' : ''}">${isIncome ? '+' : '-'} ${formatCurrency(amt)}</span>
-                        <button onclick="editTransaction('${id}')" class="text-slate-400 hover:text-brand-500 transition-all text-xs p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg" title="Editar">
+                        <button onclick="window.editTransaction('${id}')" class="text-slate-400 hover:text-brand-500 transition-all text-xs p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg" title="Editar">
                             <i class="fa-solid fa-pen"></i>
                         </button>
-                        <button onclick="deleteTransaction('${id}')" class="text-slate-400 hover:text-rose-500 transition-all text-xs p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg" title="Excluir">
+                        <button onclick="window.deleteTransaction('${id}')" class="text-slate-400 hover:text-rose-500 transition-all text-xs p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg" title="Excluir">
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </div>
@@ -949,9 +949,9 @@
             
             recentList.innerHTML = recentFiltered.slice(0, 4).map(renderItem).join('') || `<p class="text-center p-6 text-sm text-slate-400">Nenhum registro para este mês.</p>`;
             fullList.innerHTML = filteredTxs.map(renderItem).join('') || `<p class="text-center p-6 text-sm text-slate-400">Nenhum registro correspondente.</p>`;
-        }
+        };
 
-        function openModal(type, editData = null) {
+        window.openModal = function(type, editData = null) {
             document.getElementById('txId').value = editData ? editData.id : '';
             document.getElementById('txType').value = editData ? editData.type : type;
             document.getElementById('modalTitle').innerText = editData ? 'Editar Transação' : (type === 'receita' ? 'Adicionar Receita' : 'Adicionar Despesa / Aporte');
@@ -982,21 +982,21 @@
                 modal.classList.remove('opacity-0'); 
                 document.getElementById('modalContent').classList.remove('scale-95'); 
             }, 10);
-        }
+        };
 
-        function editTransaction(id) {
+        window.editTransaction = function(id) {
             const tx = window.state.transactions.find(t => t.id === id);
-            if (tx) openModal(tx.type, tx);
-        }
+            if (tx) window.openModal(tx.type, tx);
+        };
 
-        function closeModal() {
+        window.closeModal = function() {
             const modal = document.getElementById('transactionModal');
             modal.classList.add('opacity-0'); 
             document.getElementById('modalContent').classList.add('scale-95');
             setTimeout(() => modal.classList.add('hidden'), 300);
-        }
+        };
 
-        function exportToCSV() {
+        window.exportToCSV = function() {
             const txs = window.state.transactions || [];
             if(txs.length === 0) {
                 alert("Nenhuma transação disponível para exportação.");
@@ -1004,20 +1004,21 @@
             }
             let csvContent = "data:text/csv;charset=utf-8,ID,Data,Tipo,Descricao,Categoria,Valor\n";
             txs.forEach(t => {
-                const row = `"${t.id}","${t.date}","${t.type}","${t.description.replace(/"/g, '""')}","${t.category}","${t.amount}"`;
+                const desc = (t.description || '').replace(/"/g, '""');
+                const row = `"${t.id}","${t.date}","${t.type}","${desc}","${t.category}","${t.amount}"`;
                 csvContent += row + "\n";
             });
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `FintechPro_v2_Export_${getLocalDateString()}.csv`);
+            link.setAttribute("download", `FintechPro_v2_1_Export_${getLocalDateString()}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-        }
+        };
 
         document.getElementById('transactionModal').addEventListener('click', function(e) { 
-            if(e.target === this) closeModal(); 
+            if(e.target === this) window.closeModal(); 
         });
 
         document.addEventListener('click', function(e) {
@@ -1031,7 +1032,7 @@
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 const modal = document.getElementById('transactionModal');
-                if (!modal.classList.contains('hidden')) closeModal();
+                if (!modal.classList.contains('hidden')) window.closeModal();
                 closeMonthDropdown();
             }
         });
@@ -1048,9 +1049,9 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             if (localStorage.getItem('theme') === 'light') document.documentElement.classList.remove('dark');
-            updateMonthSelectorOptions(); 
-            updateMetrics(); 
-            renderTransactions();
+            window.updateMonthSelectorOptions(); 
+            window.updateMetrics(); 
+            window.renderTransactions();
         });
     </script>
 </body>
