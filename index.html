@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fintech Pro v2.1 - Gestão Financeira Completa</title>
+    <title>Fintech Pro v2.2 - Gestão Financeira Completa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -136,7 +136,7 @@
             </button>
             <div class="flex items-center justify-center text-xs text-slate-400 gap-2">
                 <i class="fa-solid fa-cloud text-brand-500 text-sm animate-pulseSlow" id="syncIcon"></i>
-                <span class="font-medium tracking-wide" id="syncStatus">Sincronizado v2.1</span>
+                <span class="font-medium tracking-wide" id="syncStatus">Sincronizado v2.2</span>
             </div>
         </div>
     </aside>
@@ -491,7 +491,7 @@
             }
             const titles = { dashboard: 'Painel Financeiro', transactions: 'Histórico de Transações', budgets: 'Orçamentos & Aportes' };
             document.getElementById('pageTitle').innerText = titles[tabId] || 'Painel Financeiro';
-            document.title = `${titles[tabId] || 'Painel'} | Fintech Pro v2.1`;
+            document.title = `${titles[tabId] || 'Painel'} | Fintech Pro v2.2`;
         };
 
         function sanitizeString(str) { 
@@ -577,7 +577,7 @@
             if (!icon || !status) return;
             if (connected) {
                 icon.className = "fa-solid fa-cloud text-brand-500 text-sm animate-pulseSlow";
-                status.innerText = "Sincronizado v2.1";
+                status.innerText = "Sincronizado v2.2";
                 status.className = "font-medium tracking-wide text-slate-400";
             } else {
                 icon.className = "fa-solid fa-triangle-exclamation text-amber-500 text-sm";
@@ -1011,7 +1011,7 @@
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `FintechPro_v2_1_Export_${getLocalDateString()}.csv`);
+            link.setAttribute("download", `FintechPro_v2_2_Export_${getLocalDateString()}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
