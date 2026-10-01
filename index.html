@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fintech Pro v2.2 - Gestão Financeira Completa</title>
+    <title>Fintech Pro v2.3.1 - Gestão Financeira Completa</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -136,7 +136,7 @@
             </button>
             <div class="flex items-center justify-center text-xs text-slate-400 gap-2">
                 <i class="fa-solid fa-cloud text-brand-500 text-sm animate-pulseSlow" id="syncIcon"></i>
-                <span class="font-medium tracking-wide" id="syncStatus">Sincronizado v2.2</span>
+                <span class="font-medium tracking-wide" id="syncStatus">Sincronizado v2.3.1</span>
             </div>
         </div>
     </aside>
@@ -188,16 +188,23 @@
 
         <!-- TAB: DASHBOARD -->
         <section id="tab-dashboard" class="tab-content active space-y-6">
-             <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 <div class="bg-white dark:bg-darkCard p-5 rounded-2xl border border-slate-200/60 dark:border-slate-700/40 shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Saldo Líquido</p>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Saldo Líquido Total</p>
                     <p id="totalBalance" class="text-2xl font-bold mt-2 text-slate-900 dark:text-white tracking-tight">R$ 0,00</p>
                     <div class="absolute -right-2 -bottom-4 text-slate-100 dark:text-slate-800/20 text-6xl font-bold pointer-events-none">
                         <i class="fa-solid fa-scale-balanced"></i>
                     </div>
                 </div>
                 <div class="bg-white dark:bg-darkCard p-5 rounded-2xl border border-slate-200/60 dark:border-slate-700/40 shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Receitas</p>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Saldo Acumulado Ant.</p>
+                    <p id="previousBalanceCard" class="text-2xl font-bold mt-2 text-sky-500 tracking-tight">R$ 0,00</p>
+                    <div class="absolute -right-2 -bottom-4 text-sky-500/5 text-6xl font-bold pointer-events-none">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                </div>
+                <div class="bg-white dark:bg-darkCard p-5 rounded-2xl border border-slate-200/60 dark:border-slate-700/40 shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Receitas do Mês</p>
                     <p id="totalIncomes" class="text-2xl font-bold mt-2 text-emerald-500 tracking-tight">R$ 0,00</p>
                     <div class="absolute -right-2 -bottom-4 text-emerald-500/5 text-6xl font-bold pointer-events-none">
                         <i class="fa-solid fa-arrow-trend-up"></i>
@@ -211,7 +218,7 @@
                     </div>
                 </div>
                 <div class="bg-white dark:bg-darkCard p-5 rounded-2xl border border-slate-200/60 dark:border-slate-700/40 shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Aportado</p>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Aportado Mês</p>
                     <p id="totalAportesCard" class="text-2xl font-bold mt-2 text-brand-500 tracking-tight">R$ 0,00</p>
                     <div class="absolute -right-2 -bottom-4 text-brand-500/5 text-6xl font-bold pointer-events-none">
                         <i class="fa-solid fa-piggy-bank"></i>
@@ -323,7 +330,13 @@
             </div>
             <form id="transactionForm" onsubmit="window.handleFormSubmit(event)" class="p-6 space-y-4">
                 <input type="hidden" id="txId" value="">
-                <input type="hidden" id="txType" value="receita">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Tipo de Fluxo</label>
+                    <select id="txType" onchange="window.updateModalCategories()" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white transition-all cursor-pointer">
+                        <option value="receita">Receita (+)</option>
+                        <option value="despesa">Despesa / Aporte (-)</option>
+                    </select>
+                </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Descrição do Item</label>
                     <input type="text" id="txDescription" required maxlength="60" placeholder="Ex: Tesouro Selic, Bitcoin, Supermercado" class="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white transition-all">
@@ -491,7 +504,7 @@
             }
             const titles = { dashboard: 'Painel Financeiro', transactions: 'Histórico de Transações', budgets: 'Orçamentos & Aportes' };
             document.getElementById('pageTitle').innerText = titles[tabId] || 'Painel Financeiro';
-            document.title = `${titles[tabId] || 'Painel'} | Fintech Pro v2.2`;
+            document.title = `${titles[tabId] || 'Painel'} | Fintech Pro v2.3.1`;
         };
 
         function sanitizeString(str) { 
@@ -505,14 +518,40 @@
         }
         
         function safeDatePrefix(dateStr) {
-            return (dateStr && typeof dateStr === 'string' && dateStr.length >= 7) ? dateStr.substring(0, 7) : '';
+            if (!dateStr || typeof dateStr !== 'string') return '';
+            const parts = dateStr.split('-');
+            if (parts.length >= 2) {
+                return `${parts[0]}-${parts[1].padStart(2, '0')}`;
+            }
+            return '';
         }
 
         function safeDateFormat(dateStr) {
             if (!dateStr || typeof dateStr !== 'string') return '--/--/----';
             const parts = dateStr.split('-');
             if (parts.length !== 3) return dateStr;
-            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`;
+        }
+
+        // CALCULA SALDO ACUMULADO STRICTAMENTE ANTERIOR AO MÊS SELECIONADO
+        function getPreviousAccumulatedBalance(selectedMonth) {
+            if (selectedMonth === 'all' || !selectedMonth) return 0;
+            
+            let accumulated = 0;
+            if (window.state && window.state.transactions) {
+                window.state.transactions.forEach(tx => {
+                    const txMonth = safeDatePrefix(tx.date);
+                    if (txMonth && txMonth < selectedMonth) {
+                        const amt = parseFloat(tx.amount) || 0;
+                        if (tx.type === 'receita') {
+                            accumulated += amt;
+                        } else {
+                            accumulated -= amt;
+                        }
+                    }
+                });
+            }
+            return accumulated;
         }
 
         function getMonthData() {
@@ -525,6 +564,7 @@
             let aporteReserva = 0;
             
             const selectedMonth = selectedMonthValue;
+            const previousBalance = getPreviousAccumulatedBalance(selectedMonth);
             
             if(window.state && window.state.transactions) {
                 window.state.transactions.forEach(tx => {
@@ -558,6 +598,7 @@
             const totalOutflows = pureExpenses + totalAportes;
             
             return { 
+                previousBalance,
                 incomes, 
                 expenses: totalOutflows, 
                 pureExpenses,
@@ -577,7 +618,7 @@
             if (!icon || !status) return;
             if (connected) {
                 icon.className = "fa-solid fa-cloud text-brand-500 text-sm animate-pulseSlow";
-                status.innerText = "Sincronizado v2.2";
+                status.innerText = "Sincronizado v2.3.1";
                 status.className = "font-medium tracking-wide text-slate-400";
             } else {
                 icon.className = "fa-solid fa-triangle-exclamation text-amber-500 text-sm";
@@ -690,7 +731,8 @@
                 return;
             }
             const [year, month] = selectedMonthValue.split('-');
-            label.innerText = `${monthNames[parseInt(month, 10) - 1]} / ${year}`;
+            const monthIdx = parseInt(month, 10) - 1;
+            label.innerText = `${monthNames[monthIdx] || month} / ${year}`;
         }
 
         window.updateMonthSelectorOptions = function() {
@@ -728,8 +770,11 @@
             const data = getMonthData();
             const incomes = data.incomes; 
             const totalOutflows = data.expenses;
+            const currentMonthBalance = incomes - totalOutflows;
+            const totalLiquidBalance = data.previousBalance + currentMonthBalance;
             
-            document.getElementById('totalBalance').innerText = formatCurrency(incomes - totalOutflows);
+            document.getElementById('totalBalance').innerText = formatCurrency(totalLiquidBalance);
+            document.getElementById('previousBalanceCard').innerText = formatCurrency(data.previousBalance);
             document.getElementById('totalIncomes').innerText = formatCurrency(incomes);
             document.getElementById('totalExpensesOnly').innerText = formatCurrency(data.pureExpenses);
             document.getElementById('totalAportesCard').innerText = formatCurrency(data.totalAportes);
@@ -835,7 +880,7 @@
         function renderCharts(totalExpenses, selectedMonth) {
             const chartContainer = document.getElementById('chartContainer');
             if(!chartContainer) return;
-            if (totalExpenses === 0) { 
+            if (totalExpenses <= 0) { 
                 chartContainer.innerHTML = `<p class="text-sm text-slate-400 text-center py-8">Nenhuma saída ou aporte registrado.</p>`; 
                 return; 
             }
@@ -852,10 +897,16 @@
             
             const sortedCats = Object.entries(categoriesMap).sort((a, b) => b[1] - a[1]);
             
+            if (sortedCats.length === 0) {
+                chartContainer.innerHTML = `<p class="text-sm text-slate-400 text-center py-8">Nenhuma saída ou aporte registrado.</p>`; 
+                return;
+            }
+
             chartContainer.innerHTML = '';
             sortedCats.forEach(([cat, amt]) => {
-                const pct = totalExpenses > 0 ? Math.round((amt / totalExpenses) * 100) : 0;
-                if (pct === 0) return;
+                const pctCalc = totalExpenses > 0 ? (amt / totalExpenses) * 100 : 0;
+                const pct = Math.round(pctCalc);
+                if (pct <= 0 && amt <= 0) return;
                 const isAporte = cat.startsWith('Aporte');
                 
                 chartContainer.innerHTML += `
@@ -865,7 +916,7 @@
                             <span class="text-slate-500 dark:text-slate-400">${formatCurrency(amt)} (${pct}%)</span>
                         </div>
                         <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2">
-                            <div class="${isAporte ? 'bg-emerald-500' : 'bg-brand-500'} h-2 rounded-full transition-all" style="width: ${pct}%"></div>
+                            <div class="${isAporte ? 'bg-emerald-500' : 'bg-brand-500'} h-2 rounded-full transition-all" style="width: ${Math.min(pct, 100)}%"></div>
                         </div>
                     </div>`;
             });
@@ -876,7 +927,7 @@
             const fullList = document.getElementById('fullTransactionsList');
             if(!recentList || !fullList) return;
 
-            const searchVal = document.getElementById('searchInput') ? document.getElementById('searchInput').value.toLowerCase() : "";
+            const searchVal = document.getElementById('searchInput') ? document.getElementById('searchInput').value.toLowerCase().trim() : "";
             const filterType = document.getElementById('filterType') ? document.getElementById('filterType').value : "all";
             const selectedMonthLocal = selectedMonthValue;
 
@@ -951,20 +1002,26 @@
             fullList.innerHTML = filteredTxs.map(renderItem).join('') || `<p class="text-center p-6 text-sm text-slate-400">Nenhum registro correspondente.</p>`;
         };
 
-        window.openModal = function(type, editData = null) {
-            document.getElementById('txId').value = editData ? editData.id : '';
-            document.getElementById('txType').value = editData ? editData.type : type;
-            document.getElementById('modalTitle').innerText = editData ? 'Editar Transação' : (type === 'receita' ? 'Adicionar Receita' : 'Adicionar Despesa / Aporte');
-            
+        window.updateModalCategories = function() {
+            const currentType = document.getElementById('txType').value;
             const catSelect = document.getElementById('txCategory');
+            if(!catSelect) return;
             catSelect.innerHTML = '';
-            const activeType = editData ? editData.type : type;
-            (categoriesByType[activeType] || categoriesByType.despesa).forEach(cat => {
+            (categoriesByType[currentType] || categoriesByType.despesa).forEach(cat => {
                 const opt = document.createElement('option');
                 opt.value = cat.value;
                 opt.textContent = cat.label;
                 catSelect.appendChild(opt);
             });
+        };
+
+        window.openModal = function(type, editData = null) {
+            document.getElementById('txId').value = editData ? editData.id : '';
+            const activeType = editData ? editData.type : type;
+            document.getElementById('txType').value = activeType;
+            document.getElementById('modalTitle').innerText = editData ? 'Editar Transação' : (type === 'receita' ? 'Adicionar Receita' : 'Adicionar Despesa / Aporte');
+            
+            window.updateModalCategories();
 
             if (editData) {
                 document.getElementById('txDescription').value = editData.description || '';
@@ -973,6 +1030,8 @@
                 document.getElementById('txDate').value = editData.date || getLocalDateString();
             } else {
                 document.getElementById('transactionForm').reset();
+                document.getElementById('txType').value = type;
+                window.updateModalCategories();
                 document.getElementById('txDate').value = getLocalDateString();
             }
 
@@ -1002,16 +1061,18 @@
                 alert("Nenhuma transação disponível para exportação.");
                 return;
             }
-            let csvContent = "data:text/csv;charset=utf-8,ID,Data,Tipo,Descricao,Categoria,Valor\n";
+            // Inclui BOM (\uFEFF) para forçar codificação UTF-8 no Excel
+            let csvContent = "\uFEFFID,Data,Tipo,Descricao,Categoria,Valor\n";
             txs.forEach(t => {
                 const desc = (t.description || '').replace(/"/g, '""');
-                const row = `"${t.id}","${t.date}","${t.type}","${desc}","${t.category}","${t.amount}"`;
+                const cat = (t.category || '').replace(/"/g, '""');
+                const row = `"${t.id}","${t.date}","${t.type}","${desc}","${cat}","${t.amount}"`;
                 csvContent += row + "\n";
             });
-            const encodedUri = encodeURI(csvContent);
+            const encodedUri = "data:text/csv;charset=utf-8," + encodeURIComponent(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `FintechPro_v2_2_Export_${getLocalDateString()}.csv`);
+            link.setAttribute("download", `FintechPro_v2_3_1_Export_${getLocalDateString()}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
